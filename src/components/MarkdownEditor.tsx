@@ -20,7 +20,7 @@ class MarkdownTextNode extends TextNode {
   }
 
   static clone(node: MarkdownTextNode): MarkdownTextNode {
-    return new MarkdownTextNode(node.__text, node.__key);
+    return new MarkdownTextNode(node.getTextContent(), node.getKey());
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -90,8 +90,9 @@ class MarkdownTextNode extends TextNode {
           while (closePos < len) {
             if (text[closePos] === delimiter) {
               // Make sure it's not part of ** or __
-              if ((closePos + 1 >= len || text[closePos + 1] !== delimiter) &&
-                  (closePos - 1 < pos || text[closePos - 1] !== delimiter)) {
+              const notFollowedByDelimiter = closePos + 1 >= len || text[closePos + 1] !== delimiter;
+              const notPrecededByDelimiter = closePos === 0 || text[closePos - 1] !== delimiter;
+              if (notFollowedByDelimiter && notPrecededByDelimiter) {
                 break;
               }
             }

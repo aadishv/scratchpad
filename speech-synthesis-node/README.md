@@ -27,11 +27,11 @@ WASM would make sense if we were porting a pure algorithmic TTS engine (like eSp
 
 ### Platform Implementations
 
-| Platform | API Used | Implementation File |
-|----------|----------|---------------------|
-| macOS    | AVFoundation (AVSpeechSynthesizer) | `native/tts_macos.mm` |
-| Windows  | SAPI (ISpVoice) | `native/tts_windows.cpp` |
-| Linux    | speech-dispatcher | `native/tts_linux.cpp` |
+| Platform | API Used | Implementation Status | Features |
+|----------|----------|----------------------|----------|
+| macOS 10.14+ | AVSpeechSynthesizer | ✅ Fully Implemented | Full event support, word boundaries |
+| Windows 7+ | SAPI 5.0 (ISpVoice) | ✅ Fully Implemented | Full event support, word/sentence boundaries |
+| Linux | speech-dispatcher (libspeechd) | ✅ Fully Implemented | Full API support, simulated word boundaries |
 
 ## Installation
 
@@ -63,9 +63,28 @@ node examples/basic.js
 - **Node.js**: >= 16.0.0
 - **Bun**: >= 1.0.0 (optional)
 - **Build tools**:
-  - macOS: Xcode Command Line Tools
-  - Windows: Visual Studio Build Tools
-  - Linux: GCC, speech-dispatcher development files
+  - **macOS**: Xcode Command Line Tools (`xcode-select --install`)
+  - **Windows**: Visual Studio Build Tools with C++ support
+  - **Linux**: GCC and speech-dispatcher development files (`sudo apt-get install libspeechd-dev` on Debian/Ubuntu)
+
+#### Platform-Specific Notes
+
+**macOS**:
+- Requires macOS 10.14 (Mojave) or later
+- Uses AVSpeechSynthesizer from AVFoundation framework
+- Full word boundary and event support
+
+**Windows**:
+- Requires Windows 7 or later
+- Uses SAPI 5.0 (ISpVoice)
+- Full word/sentence boundary events
+- COM-based implementation with automatic initialization
+
+**Linux**:
+- Requires speech-dispatcher daemon running
+- Install: `sudo apt-get install speech-dispatcher libspeechd-dev`
+- Start daemon: `systemctl --user start speech-dispatcher`
+- Note: Word boundaries are simulated (speech-dispatcher limitation)
 
 ## Usage
 

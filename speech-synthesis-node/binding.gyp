@@ -39,7 +39,9 @@
           }
         }],
         ["OS=='linux'", {
-          "sources": [ "native/tts_linux.cpp" ]
+          "sources": [ "native/tts_linux.cpp" ],
+          "libraries": [ "-lspeechd" ],
+          "cflags": [ "-pthread" ]
         }]
       ]
     }

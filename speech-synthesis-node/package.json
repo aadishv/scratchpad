@@ -1,0 +1,38 @@
+{
+  "name": "speech-synthesis-node",
+  "version": "1.0.0",
+  "description": "Web SpeechSynthesis API implementation for Node.js and Bun using native OS TTS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && node-gyp rebuild",
+    "build:bun": "tsc && cmake-js rebuild",
+    "test": "node examples/test.js",
+    "clean": "rm -rf build dist"
+  },
+  "keywords": [
+    "speech",
+    "synthesis",
+    "tts",
+    "text-to-speech",
+    "web-speech-api",
+    "node",
+    "bun",
+    "native"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-addon-api": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "cmake-js": "^7.2.1",
+    "node-gyp": "^10.0.0",
+    "typescript": "^5.0.0"
+  },
+  "gypfile": true,
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

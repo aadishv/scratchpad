@@ -6,12 +6,6 @@
 #import <Foundation/Foundation.h>
 #include <dispatch/dispatch.h>
 
-// Forward declare namespace types for Objective-C
-namespace speech_synthesis {
-    struct SpeechEvent;
-    enum EventType : int;
-}
-
 // Objective-C interface and implementation must be at global scope
 @interface SpeechDelegate : NSObject<AVSpeechSynthesizerDelegate>
 @property (nonatomic, copy) void(^eventCallback)(const speech_synthesis::SpeechEvent&);

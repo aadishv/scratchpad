@@ -29,7 +29,7 @@
           "xcode_settings": {
             "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
             "CLANG_CXX_LIBRARY": "libc++",
-            "MACOSX_DEPLOYMENT_TARGET": "10.13"
+            "MACOSX_DEPLOYMENT_TARGET": "10.14"
           },
           "link_settings": {
             "libraries": [

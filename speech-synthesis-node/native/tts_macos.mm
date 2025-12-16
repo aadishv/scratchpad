@@ -6,10 +6,15 @@
 #import <Foundation/Foundation.h>
 #include <dispatch/dispatch.h>
 
+// Forward declare namespace types for Objective-C
 namespace speech_synthesis {
+    struct SpeechEvent;
+    enum EventType : int;
+}
 
+// Objective-C interface and implementation must be at global scope
 @interface SpeechDelegate : NSObject<AVSpeechSynthesizerDelegate>
-@property (nonatomic, copy) void(^eventCallback)(const SpeechEvent&);
+@property (nonatomic, copy) void(^eventCallback)(const speech_synthesis::SpeechEvent&);
 @property (nonatomic, assign) std::string* currentText;
 @end
 
@@ -18,8 +23,8 @@ namespace speech_synthesis {
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
         didStartSpeechUtterance:(AVSpeechUtterance *)utterance {
     if (self.eventCallback) {
-        SpeechEvent event;
-        event.type = EVENT_START;
+        speech_synthesis::SpeechEvent event;
+        event.type = speech_synthesis::EVENT_START;
         event.charIndex = 0;
         event.charLength = 0;
         event.elapsedTime = 0.0f;
@@ -30,8 +35,8 @@ namespace speech_synthesis {
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
         didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
     if (self.eventCallback) {
-        SpeechEvent event;
-        event.type = EVENT_END;
+        speech_synthesis::SpeechEvent event;
+        event.type = speech_synthesis::EVENT_END;
         event.charIndex = self.currentText ? (int)self.currentText->length() : 0;
         event.charLength = 0;
         event.elapsedTime = 0.0f;
@@ -43,8 +48,8 @@ namespace speech_synthesis {
         willSpeakRangeOfSpeechString:(NSRange)characterRange 
         utterance:(AVSpeechUtterance *)utterance {
     if (self.eventCallback) {
-        SpeechEvent event;
-        event.type = EVENT_WORD;
+        speech_synthesis::SpeechEvent event;
+        event.type = speech_synthesis::EVENT_WORD;
         event.charIndex = (int)characterRange.location;
         event.charLength = (int)characterRange.length;
         event.elapsedTime = 0.0f;
@@ -55,8 +60,8 @@ namespace speech_synthesis {
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
         didPauseSpeechUtterance:(AVSpeechUtterance *)utterance {
     if (self.eventCallback) {
-        SpeechEvent event;
-        event.type = EVENT_PAUSE;
+        speech_synthesis::SpeechEvent event;
+        event.type = speech_synthesis::EVENT_PAUSE;
         event.charIndex = 0;
         event.charLength = 0;
         event.elapsedTime = 0.0f;
@@ -67,8 +72,8 @@ namespace speech_synthesis {
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
         didContinueSpeechUtterance:(AVSpeechUtterance *)utterance {
     if (self.eventCallback) {
-        SpeechEvent event;
-        event.type = EVENT_RESUME;
+        speech_synthesis::SpeechEvent event;
+        event.type = speech_synthesis::EVENT_RESUME;
         event.charIndex = 0;
         event.charLength = 0;
         event.elapsedTime = 0.0f;
@@ -77,6 +82,8 @@ namespace speech_synthesis {
 }
 
 @end
+
+namespace speech_synthesis {
 
 class MacOSTTS : public TTSPlatform {
 public:

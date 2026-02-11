@@ -1,0 +1,119 @@
+.editor-container {
+  background: #2f3136;
+  border-radius: 8px;
+  border: 1px solid #202225;
+  position: relative;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.editor-input {
+  min-height: 300px;
+  resize: none;
+  font-size: 16px;
+  position: relative;
+  tab-size: 1;
+  outline: 0;
+  padding: 15px 20px;
+  caret-color: #fff;
+  color: #dcddde;
+}
+
+.editor-placeholder {
+  color: #72767d;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 15px;
+  left: 20px;
+  font-size: 16px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none;
+  line-height: 1.6;
+}
+
+.editor-paragraph {
+  margin: 0;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+/* Markdown syntax styling - gray out special characters like Discord */
+.markdown-syntax {
+  color: #72767d;
+  opacity: 0.5;
+}
+
+/* Bold styling */
+.markdown-bold {
+  font-weight: 700;
+  color: #dcddde;
+}
+
+/* Italic styling */
+.markdown-italic {
+  font-style: italic;
+  color: #dcddde;
+}
+
+/* Strikethrough styling */
+.markdown-strikethrough {
+  text-decoration: line-through;
+  color: #dcddde;
+}
+
+/* Heading styling */
+.markdown-heading {
+  font-weight: 700;
+  color: #ffffff;
+  display: inline-block;
+}
+
+.markdown-h1 {
+  font-size: 2em;
+  line-height: 1.2;
+}
+
+.markdown-h2 {
+  font-size: 1.5em;
+  line-height: 1.3;
+}
+
+.markdown-h3 {
+  font-size: 1.25em;
+  line-height: 1.4;
+}
+
+.markdown-h4 {
+  font-size: 1.1em;
+  line-height: 1.4;
+}
+
+.markdown-h5 {
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+.markdown-h6 {
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* List item styling */
+.markdown-list-item {
+  color: #dcddde;
+}
+
+/* Editor text styles */
+.editor-text-bold {
+  font-weight: bold;
+}
+
+.editor-text-italic {
+  font-style: italic;
+}
+
+.editor-text-strikethrough {
+  text-decoration: line-through;
+}

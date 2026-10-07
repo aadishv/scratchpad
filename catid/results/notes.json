@@ -41,6 +41,10 @@
    "body": "What you would confirm in practice is one group per cat per visit, not single photos. Scoring 58 (visit, cat) groups of cats seen before, with DINOv2-B + recipe + query expansion: if each photo in the group takes its single best match in that cat's history and the group averages those, the right cat is first 74% of the time and in the top 3 93%. Averaging each photo's top 3 matches is worse (67%), and using only the cat's last two visits is worse too (67%): one good old photo from the right angle beats several recent ones."
   },
   {
+   "title": "Face crops: as good as the whole body, +2 points when combined",
+   "body": "OWLv2 (open-vocabulary detection, prompt 'a cat's face') found a head box in about three quarters of crops. Faces were re-cut from the full-resolution originals and embedded with DINOv2. The face alone matches cats across visits about as well as the whole body (top-1 0.54 vs 0.54 for B, set-level top-1 0.63 vs 0.60). Averaging face and body similarity gives +2 points top-1 (0.56) and the best open-set accuracy so far (0.62). Black and tuxedo cats gain only 1 to 3 points (0.42 to 0.44 with DINOv2-S), so faces do not solve the black-cat problem. OWLv2 costs about 3 s per crop on CPU, too slow for the fast pipeline. A small dedicated cat-face detector would be needed to use this."
+  },
+  {
    "title": "Detector: a 37x faster YOLO keeps 77 to 85% of the cats",
    "body": "A helper benchmarked 28 detector settings against the YOLO11x-seg reference (975 cats, 1,965 ms per photo on 4 CPU cores). OpenVINO runs the same models 2.2 to 3.4 times faster than PyTorch with the same accuracy, while ONNX Runtime is slower than PyTorch. Fast setting: YOLO11s-seg at 640px on OpenVINO, 53 to 57 ms per photo, keeping 77% of the reference's cats at 94% agreement. 640px loses small cats in group shots. Balanced setting: YOLO11m-seg at 1024px on OpenVINO int8, conf 0.25, 185 ms per photo, keeping 85% of the cats and 94% of the confident ones. YOLO26 is no better than YOLO11, and box-only models are only 10 to 20% faster than segmentation ones."
   },

@@ -24,3 +24,13 @@ ms/crop is the shared forward pass on 3 CPU threads (all poolings of a run come 
 | dinov2_b_raw_cls_448 | crops | 0.493 | 0.764 | 0.852 | 0.592 | 0.616 | 1283 |
 | dinov2_b_raw_cat_448 | crops | 0.425 | 0.740 | 0.850 | 0.586 | 0.599 | 1283 |
 | dinov2_b_raw_catm_448 | crops, cls+mask-mean | 0.478 | 0.756 | 0.852 | 0.616 | 0.621 | 1283 |
+| dinov3_b_raw_cls_320 | crops | 0.515 | 0.732 | 0.841 | 0.616 | 0.623 | 482 |
+| dinov3_b_raw_mean_320 | crops | 0.295 | 0.585 | 0.787 | 0.529 | 0.533 | 482 |
+| dinov3_b_raw_cat_320 | crops | 0.454 | 0.699 | 0.844 | 0.605 | 0.616 | 482 |
+| dinov3_b_raw_mmean_320 | crops, mask-weighted | 0.403 | 0.715 | 0.815 | 0.550 | 0.557 | 482 |
+| dinov3_b_raw_catm_320 | crops, cls+mask-mean | 0.502 | 0.756 | 0.842 | 0.616 | 0.610 | 482 |
+
+Conclusion: CLS stays the best single pooling; patch mean/GeM, with or without the mask, are far worse (-0.05 to -0.2 top1), and concatenating
+them with CLS only shifts +recency by about ±0.02 (noise level, n≈120 queries). The robust gain is feeding unmasked crops (crops/) instead
+of cropsm: DINOv2-B CLS goes from 0.463/0.732/0.592 to 0.491/0.772/0.608. 224 vs 336 vs 448 is within noise, so 224 (2.4x faster) is fine.
+DINOv3-B CLS on crops/ at 320 gives the best top1 (0.515) and +recency (0.623).

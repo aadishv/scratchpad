@@ -24,12 +24,25 @@
    "stage": "Heuristics",
    "state": "running",
    "detail": "Done on DINOv2-B: duplicate removal, collar colour, burst pooling, whitening, re-ranking, learned heads (negative). Next: background masking ablation, coat-colour gating, recency prior."
+  },
+  {
+   "stage": "Fast pipeline",
+   "state": "running",
+   "detail": "pipeline.py works end to end (detect, dedupe, embed, collar, group, match, HTML). Tuning speed: smaller embedder, ONNX. Detector benchmark helper still running."
   }
  ],
  "findings": [
   {
    "title": "Current best: the right cat is in the top 3 suggestions 87% of the time",
    "body": "Recipe: DINOv2-B on the plain crop (no background masking), centered, burst shots pooled, plus collar colour and a zero-shot coat-pattern gate. For a cluster of today's photos of a cat that has been seen before, the right name is the first suggestion 58% of the time and in the top 3 87% of the time. The hard part is deciding 'new cat vs known cat': the balanced end-to-end score is about 0.61."
+  },
+  {
+   "title": "Patterned cats are easy, black cats and tabbies are hard",
+   "body": "Cross-visit top-1 by coat: calico/tortie 0.83, colourpoint/white 0.68, orange 0.49, tuxedo/bicolour 0.42, solid black 0.35, tabby 0.35. Calico patches work like a fingerprint. Black cats differ mainly in eye colour, size, fur length and collar, and generic embeddings barely see those. For black cats, collars (and the names written on them) carry most of the signal."
+  },
+  {
+   "title": "A fast pipeline for a new visit: about 1 s per photo on a laptop-class CPU",
+   "body": "catid/pipeline.py takes a folder of new photos and the roster of confirmed cats and returns groups with top-3 suggestions or 'new cat', plus an HTML contact sheet. YOLO11n-seg at 640px with DINOv2-B runs at about 0.6 s per photo on 4 cores (1 s while sharing the CPU), against 2 s per photo for detection alone with the big YOLO. Embedding is two thirds of the time; a smaller DINOv2 and ONNX are next. Replaying the Oct 6 visit against the roster from earlier visits: known cats named right first 79%, in the top 3 100%, and 83% of new-kitten crops correctly flagged as new (threshold 0.55)."
   },
   {
    "title": "Two detections in one photo are usually the same cat",

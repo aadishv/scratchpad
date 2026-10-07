@@ -216,6 +216,10 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
       <div><b>Open-set</b>: replaying visits in order, does a query get the right known cat, or "new cat" if it has never been seen?</div>
     </div>
     <div class="panel tbl-wrap"><table class="res" id="res"></table></div>
+    <h2 style="margin-top:26px">Which cats are hard</h2>
+    <div class="panel" id="bycoat"></div>
+    <h2 style="margin-top:26px">Fast pipeline timing (Oct 6 visit replay)</h2>
+    <div class="panel tbl-wrap"><table class="res" id="pipe"></table></div>
     <h2 style="margin-top:26px">Embedding cost</h2>
     <div class="panel tbl-wrap"><table class="res" id="speed"></table></div>
   </section>
@@ -507,7 +511,23 @@ const COLS = [['name', 'Variant'], ['simR_bal', 'End-to-end (balanced)'], ['simR
 let sortCol = 'simR_bal';
 function renderRes() {
   const t = $('#res'); t.replaceChildren();
-  const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes(); } })); t.append(hr);
+  const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes();
+{
+  const bc = DATA.by_coat || {}; const box = $('#bycoat');
+  box.append(el('p', { class: 'sub', style: 'margin:0 0 10px', text: 'Cross-visit top-1 by coat group (best recipe). Coat group per cat from the zero-shot coat classifier.' }));
+  for (const [k, [v, n]] of Object.entries(bc).sort((a, b) => b[1][0] - a[1][0])) {
+    const row = el('div', { style: 'display:grid;grid-template-columns:130px minmax(0,1fr) 90px;gap:10px;align-items:center;margin:4px 0' });
+    const bar = el('div', { style: 'height:12px;border-radius:6px;background:var(--chip);overflow:hidden' }, el('div', { style: `height:100%;width:${(100 * v).toFixed(0)}%;background:var(--blue)` }));
+    row.append(el('span', { text: k }), bar, el('span', { style: 'font-family:var(--mono);font-size:13px', text: `${v.toFixed(2)} · n=${n}` }));
+    box.append(row);
+  }
+  const pr = DATA.pipeline_v27; const t = $('#pipe');
+  if (pr) {
+    t.append(el('tr', {}, ...['Stage', 'ms per photo'].map(x => el('th', { text: x }))));
+    for (const [k, v] of Object.entries(pr.ms_per_photo)) t.append(el('tr', {}, el('td', { text: k }), el('td', { text: v.toFixed(0) })));
+    t.append(el('tr', {}, el('td', { text: 'total', style: 'font-weight:600' }), el('td', { text: pr.ms_per_photo_total.toFixed(0), style: 'font-weight:600' })));
+  }
+} } })); t.append(hr);
   const rs = [...rows].sort((a, b) => sortCol === 'name' ? a.name.localeCompare(b.name) : (b[sortCol] ?? -1) - (a[sortCol] ?? -1));
   const top = rs[0]?.name;
   const mx = Math.max(...rows.map(r => r.loose_top1 || 0), 0.01);
@@ -523,6 +543,22 @@ function renderRes() {
   }
 }
 renderRes();
+{
+  const bc = DATA.by_coat || {}; const box = $('#bycoat');
+  box.append(el('p', { class: 'sub', style: 'margin:0 0 10px', text: 'Cross-visit top-1 by coat group (best recipe). Coat group per cat from the zero-shot coat classifier.' }));
+  for (const [k, [v, n]] of Object.entries(bc).sort((a, b) => b[1][0] - a[1][0])) {
+    const row = el('div', { style: 'display:grid;grid-template-columns:130px minmax(0,1fr) 90px;gap:10px;align-items:center;margin:4px 0' });
+    const bar = el('div', { style: 'height:12px;border-radius:6px;background:var(--chip);overflow:hidden' }, el('div', { style: `height:100%;width:${(100 * v).toFixed(0)}%;background:var(--blue)` }));
+    row.append(el('span', { text: k }), bar, el('span', { style: 'font-family:var(--mono);font-size:13px', text: `${v.toFixed(2)} · n=${n}` }));
+    box.append(row);
+  }
+  const pr = DATA.pipeline_v27; const t = $('#pipe');
+  if (pr) {
+    t.append(el('tr', {}, ...['Stage', 'ms per photo'].map(x => el('th', { text: x }))));
+    for (const [k, v] of Object.entries(pr.ms_per_photo)) t.append(el('tr', {}, el('td', { text: k }), el('td', { text: v.toFixed(0) })));
+    t.append(el('tr', {}, el('td', { text: 'total', style: 'font-weight:600' }), el('td', { text: pr.ms_per_photo_total.toFixed(0), style: 'font-weight:600' })));
+  }
+}
 {
   const t = $('#speed'); t.append(el('tr', {}, ...['Embedding', 'Variant', 'Dim', 'ms per crop (4 CPU threads)'].map(x => el('th', { text: x }))));
   for (const [k, m] of Object.entries(DATA.emb || {}).sort((a, b) => a[1].ms_per_crop - b[1].ms_per_crop)) {

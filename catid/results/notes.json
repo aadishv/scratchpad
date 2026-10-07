@@ -33,6 +33,10 @@
  ],
  "findings": [
   {
+   "title": "Overnight: graph tricks with no labels add 3 to 5 points",
+   "body": "Three label-free transductive tricks, tested in an honest online replay where each visit only sees photos from itself and earlier visits (DINOv2-B + recipe). Baseline: known-cat top-1 0.56, top-3 0.85. Alpha query expansion (each crop averaged with its 5 nearest neighbours, weighted by similarity cubed): 0.61 / 0.87. Graph diffusion on a mutual 20-nearest-neighbour graph: 0.60 / 0.90. Visit consolidation (cluster the visit, pool each crop with its predicted group): 0.59 / 0.89. Stacking them over-smooths and loses ground, so use one at a time. On the whole dataset at once, diffusion lifts retrieval mAP from 0.47 to 0.57. DINOv2-S gains less (+1 to 2 points)."
+  },
+  {
    "title": "Shelter listings as a reference: dropped",
    "body": "Matching the shelter's current adoption listings against your photos mostly paired old, since-adopted caf\u00e9 cats with newer listed cats that merely look similar (Toast came after Scythe was adopted and looks different). A listing only shows who is available now, not who was at the caf\u00e9 on a given day, so it is out of the pipeline for now."
   },

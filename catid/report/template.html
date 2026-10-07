@@ -236,6 +236,9 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <div class="panel" id="bycoat"></div>
     <h2 style="margin-top:26px">Fast pipeline timing (Oct 6 visit replay)</h2>
     <div class="panel tbl-wrap"><table class="res" id="pipe"></table></div>
+    <h2 style="margin-top:26px">Detector speed vs recall</h2>
+    <p class="sub" style="margin:0 0 10px;max-width:72ch">Against the YOLO11x-seg reference on all 587 photos, 4 CPU threads, conf 0.15. Recall = share of the reference's cats found; agreement = share of found boxes the reference also has.</p>
+    <div class="panel tbl-wrap"><table class="res" id="detbench"></table></div>
     <h2 style="margin-top:26px">Embedding cost</h2>
     <div class="panel tbl-wrap"><table class="res" id="speed"></table></div>
   </section>
@@ -600,6 +603,14 @@ let sortCol = 'simR_bal';
 function renderRes() {
   const t = $('#res'); t.replaceChildren();
   const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes();
+{
+  const t = $('#detbench'); const rows = DATA.detector_bench || [];
+  if (rows.length) {
+    t.append(el('tr', {}, ...['Model', 'Size', 'Backend', 'ms / photo', 'Recall', 'Agreement', 'Mask IoU'].map(x => el('th', { text: x }))));
+    for (const r of rows) t.append(el('tr', {}, el('td', { text: r.model }), el('td', { text: String(r.imgsz) }), el('td', { text: r.backend }),
+      el('td', { text: r.ms_per_img.toFixed(0) }), el('td', { text: r.recall.toFixed(2) }), el('td', { text: r.precision.toFixed(2) }), el('td', { text: r.mask_iou == null ? '–' : r.mask_iou.toFixed(2) })));
+  }
+}
 {
   const bc = DATA.by_coat || {}; const box = $('#bycoat');
   box.append(el('p', { class: 'sub', style: 'margin:0 0 10px', text: 'Cross-visit top-1 by coat group (best recipe). Coat group per cat from the zero-shot coat classifier.' }));

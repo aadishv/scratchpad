@@ -57,7 +57,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('photos'); ap.add_argument('--roster'); ap.add_argument('--out', default='pipeline_out')
     ap.add_argument('--det', default='yolo11n-seg.pt'); ap.add_argument('--imgsz', type=int, default=640)
-    ap.add_argument('--emb', default='dinov2_s'); ap.add_argument('--threads', type=int, default=4)
+    ap.add_argument('--emb', default='dinov2_s'); ap.add_argument('--ov-emb', default=None, help='OpenVINO .xml of the embedder (same model as --emb)'); ap.add_argument('--threads', type=int, default=4)
     ap.add_argument('--cluster-thr', type=float, default=0.7); ap.add_argument('--new-thr', type=float, default=0.71)  # calibrated: balanced known/new on labels v5 (DINOv2-S, QE, best-match scoring)
     ap.add_argument('--files', nargs='*', help='subset of file names to process')
     a = ap.parse_args()
@@ -66,7 +66,11 @@ def main():
     T = Timer(); os.makedirs(a.out, exist_ok=True)
     files = sorted(f for f in (a.files or os.listdir(a.photos)) if f.lower().endswith('.jpg'))
     with T('load models'):
-        det = YOLO(a.det); fn, S, mean, std = models.load(a.emb)
+        det = YOLO(a.det, task='segment'); fn, S, mean, std = models.load(a.emb)
+        if a.ov_emb:  # OpenVINO-compiled embedder (3.4x faster than PyTorch on CPU, same features)
+            import openvino as ov
+            _cm = ov.Core().compile_model(a.ov_emb, 'CPU', {'PERFORMANCE_HINT': 'THROUGHPUT'})
+            fn = lambda x: torch.from_numpy(_cm(x.numpy())[0])
         mean, std = torch.tensor(mean).view(3, 1, 1), torch.tensor(std).view(3, 1, 1)
     crops, meta = [], []
     for f in files:

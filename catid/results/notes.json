@@ -8,7 +8,7 @@
   {
    "stage": "Detection",
    "state": "done",
-   "detail": "YOLO11x-seg at 1024px: 975 cat detections in 576 photos. 1.8 s per photo on 4 CPUs. A helper session is benchmarking faster detectors."
+   "detail": "YOLO11x-seg reference (2 s per photo). Benchmarked 28 faster settings: YOLO11s-seg@640 on OpenVINO runs at 55 ms per photo, YOLO11m-seg@1024 OpenVINO int8 at 185 ms keeps 85% of the cats."
   },
   {
    "stage": "Hand labels",
@@ -27,8 +27,8 @@
   },
   {
    "stage": "Fast pipeline",
-   "state": "running",
-   "detail": "pipeline.py works end to end (detect, dedupe, embed, collar, group, match, HTML). Tuning speed: smaller embedder, ONNX. Detector benchmark helper still running."
+   "state": "done",
+   "detail": "pipeline.py v2 on OpenVINO: 0.28 s per photo end to end."
   }
  ],
  "findings": [
@@ -39,6 +39,10 @@
   {
    "title": "Scored per group, a visit's photos of a known cat are named right 74% first, 93% in the top 3",
    "body": "What you would confirm in practice is one group per cat per visit, not single photos. Scoring 58 (visit, cat) groups of cats seen before, with DINOv2-B + recipe + query expansion: if each photo in the group takes its single best match in that cat's history and the group averages those, the right cat is first 74% of the time and in the top 3 93%. Averaging each photo's top 3 matches is worse (67%), and using only the cat's last two visits is worse too (67%): one good old photo from the right angle beats several recent ones."
+  },
+  {
+   "title": "Detector: a 37x faster YOLO keeps 77 to 85% of the cats",
+   "body": "A helper benchmarked 28 detector settings against the YOLO11x-seg reference (975 cats, 1,965 ms per photo on 4 CPU cores). OpenVINO runs the same models 2.2 to 3.4 times faster than PyTorch with the same accuracy, while ONNX Runtime is slower than PyTorch. Fast setting: YOLO11s-seg at 640px on OpenVINO, 53 to 57 ms per photo, keeping 77% of the reference's cats at 94% agreement. 640px loses small cats in group shots. Balanced setting: YOLO11m-seg at 1024px on OpenVINO int8, conf 0.25, 185 ms per photo, keeping 85% of the cats and 94% of the confident ones. YOLO26 is no better than YOLO11, and box-only models are only 10 to 20% faster than segmentation ones."
   },
   {
    "title": "Overnight: graph tricks with no labels add 3 to 5 points",
@@ -77,8 +81,8 @@
    "body": "Cross-visit top-1 by coat: calico/tortie 0.83, colourpoint/white 0.68, orange 0.49, tuxedo/bicolour 0.42, solid black 0.35, tabby 0.35. Calico patches work like a fingerprint. Black cats differ mainly in eye colour, size, fur length and collar, and generic embeddings barely see those. For black cats, collars (and the names written on them) carry most of the signal."
   },
   {
-   "title": "A fast pipeline for a new visit: about 0.6 s per photo on 4 CPU cores",
-   "body": "catid/pipeline.py takes a folder of new photos and the roster of confirmed cats and returns groups with top-3 suggestions or 'new cat', plus an HTML contact sheet. With YOLO11n-seg at 640px and DINOv2-S it runs at about 0.58 s per photo while sharing the CPU with other jobs (detect 240 ms, embed 250 ms). That compares with 2 s per photo for detection alone with the big YOLO. DINOv2-S is as accurate as DINOv2-B here (cross-visit top-1 0.49 vs 0.49) at a quarter of the cost. Replaying the Oct 6 visit against the roster from earlier visits: known cats named right first 71 to 79%, in the top 3 100%, and 83% of new-kitten crops flagged as new."
+   "title": "Fast pipeline v2: 0.28 s per photo on 4 CPU cores",
+   "body": "catid/pipeline.py now runs YOLO11s-seg at 640px and DINOv2-S, both on OpenVINO. Matching uses query expansion over the visit and the roster, scores a group by each photo's best match, and calls a new cat at a calibrated 0.71 threshold. On the Oct 6 visit it takes 277 ms per photo end to end (detect 95, embed 89, decode 40, collar 38), even while another job was using the CPU, against 820 ms for v1 and about 2.5 s for the research setup. Replaying Oct 6 against earlier visits: known cats named right first 62%, in the top 3 81%, and new cats flagged 9 of 9."
   },
   {
    "title": "Two detections in one photo are usually the same cat",

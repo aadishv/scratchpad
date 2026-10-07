@@ -18,3 +18,9 @@ ms/crop is the shared forward pass on 3 CPU threads (all poolings of a run come 
 | dinov2_b_raw_mmean_336 | crops, mask-weighted | 0.392 | 0.699 | 0.822 | 0.551 | 0.550 | 662 |
 | dinov2_b_raw_mgem_336 | crops, mask-weighted | 0.410 | 0.707 | 0.825 | 0.542 | 0.583 | 662 |
 | dinov2_b_raw_catm_336 | crops, cls+mask-mean | 0.489 | 0.748 | 0.848 | 0.586 | 0.612 | 662 |
+| dinov2_b_raw_cls_224 | crops | 0.480 | 0.732 | 0.864 | 0.592 | 0.619 | 274 |
+| dinov2_b_raw_cat_224 | crops | 0.432 | 0.715 | 0.858 | 0.575 | 0.603 | 274 |
+| dinov2_b_raw_catm_224 | crops, cls+mask-mean | 0.471 | 0.724 | 0.854 | 0.579 | 0.603 | 274 |
+| dinov2_b_raw_cls_448 | crops | 0.493 | 0.764 | 0.852 | 0.592 | 0.616 | 1283 |
+| dinov2_b_raw_cat_448 | crops | 0.425 | 0.740 | 0.850 | 0.586 | 0.599 | 1283 |
+| dinov2_b_raw_catm_448 | crops, cls+mask-mean | 0.478 | 0.756 | 0.852 | 0.616 | 0.621 | 1283 |

@@ -1,6 +1,7 @@
 """Local-feature re-ranking (wildlife re-ID trick): DISK keypoints + LightGlue on the unmasked crops, only for
 each primary crop's top-K cross-visit candidates under the recipe similarity; score = matches / RANSAC inliers.
   python3 catid/local_match.py match [K]   -> results/local_pairs.npz (pair cache, resumable)
+  python3 catid/local_match.py sift        -> adds RootSIFT columns to the cache
   python3 catid/local_match.py fuse        -> S_recipe + w * f(n) variants through bench.score -> results/w5_results.md"""
 import sys, os, time, json, numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,7 +43,10 @@ def match(K=30):
     torch.set_num_threads(4)
     S = recipe(); pairs = candidate_pairs(S, K); print(len(pairs), 'pairs', flush=True)
     ids = [d['id'] for d in B.dets]; need = np.unique(pairs)
-    t0 = time.time(); F = dict(zip(need, features([ids[i] for i in need]))); t_feat = time.time() - t0
+    fc = f'{B.WORK}/disk_feats_{NFEAT}.pt'  # feature cache (DISK on CPU is ~3 s/crop)
+    if os.path.exists(fc): F, t_feat = torch.load(fc, weights_only=False)
+    else:
+        t0 = time.time(); F = dict(zip(need, features([ids[i] for i in need]))); t_feat = time.time() - t0; torch.save((F, t_feat), fc)
     lg = KF.LightGlue('disk').eval()
     done = {}
     if os.path.exists(CACHE):
@@ -73,8 +77,41 @@ def match(K=30):
     t_match = time.time() - t0; save(t_match, n_new)
     print(f'features {t_feat:.0f}s ({1000 * t_feat / len(need):.0f} ms/img), matching {t_match:.0f}s ({1000 * t_match / max(n_new, 1):.0f} ms/pair)')
 
+def match_sift():
+    """HotSpotter-style alternative: RootSIFT on the grey crop, ratio test 0.8 + mutual NN, F-matrix MAGSAC.
+    Adds sift_* columns to the same cache (same pair list)."""
+    import cv2
+    from PIL import Image
+    z = dict(np.load(CACHE)); P = z['pairs']; ids = [d['id'] for d in B.dets]; sift = cv2.SIFT_create(2000); F = {}
+    t0 = time.time()
+    for i in np.unique(P):
+        a = np.asarray(Image.open(f'{B.WORK}/crops/{ids[i]}.jpg').convert('RGB'), np.float32)
+        m = np.asarray(Image.open(f'{B.WORK}/cropsm/{ids[i]}.jpg').convert('RGB'), np.float32)
+        kp, d = sift.detectAndCompute(cv2.cvtColor(a.astype(np.uint8), cv2.COLOR_RGB2GRAY), None)
+        if d is None: kp, d = [], np.zeros((0, 128), np.float32)
+        d = np.sqrt(d / (d.sum(1, keepdims=True) + 1e-7)).astype(np.float32)  # RootSIFT
+        xy = np.array([k.pt for k in kp], np.float32).reshape(-1, 2); fg = np.abs(a - m).mean(2) < 12
+        F[i] = (xy, d, fg[xy[:, 1].astype(int), xy[:, 0].astype(int)] if len(xy) else np.zeros(0, bool))
+    t_feat = time.time() - t0; bf = cv2.BFMatcher(cv2.NORM_L2); out = np.zeros((len(P), 4), np.float32); t0 = time.time()
+    for k, (i, j) in enumerate(P):
+        (x0, d0, f0), (x1, d1, f1) = F[i], F[j]
+        if len(d0) < 2 or len(d1) < 2: continue
+        mm = bf.knnMatch(d0, d1, k=2); rev = bf.match(d1, d0)
+        back = {r.queryIdx: r.trainIdx for r in rev}
+        m = np.array([(a.queryIdx, a.trainIdx) for a, b in mm if a.distance < 0.8 * b.distance and back.get(a.trainIdx) == a.queryIdx]).reshape(-1, 2)
+        fgm = f0[m[:, 0]] & f1[m[:, 1]] if len(m) else np.zeros(0, bool); inl = np.zeros(len(m), bool)
+        if len(m) >= 8:
+            _, msk = cv2.findFundamentalMat(x0[m[:, 0]], x1[m[:, 1]], cv2.USAC_MAGSAC, 3.0, 0.999, 2000)
+            if msk is not None: inl = msk.ravel().astype(bool)
+        out[k] = [len(m), inl.sum(), fgm.sum(), (inl & fgm).sum()]
+    t_match = time.time() - t0
+    z.update(sift_scores=out, sift_cols=np.array(['sift_n', 'sift_inl', 'sift_n_fg', 'sift_inl_fg']), sift_t_feat=t_feat, sift_t_match=t_match)
+    np.savez_compressed(CACHE, **z)
+    print(f'sift features {t_feat:.0f}s, matching {t_match:.0f}s ({1000 * t_match / len(P):.1f} ms/pair)')
+
 def fuse():
     S0 = recipe(); z = np.load(CACHE); P, Sc, cols = z['pairs'], z['scores'], list(z['cols'])
+    if 'sift_scores' in z: Sc = np.hstack([Sc, z['sift_scores']]); cols += list(z['sift_cols'])
     coat = np.load(f'{B.WORK}/coat.npy').argmax(1)
     names = json.load(open(f'{B.WORK}/coat_names.json')) if os.path.exists(f'{B.WORK}/coat_names.json') else None
     def bonus(col, f):
@@ -82,7 +119,7 @@ def fuse():
     log = lambda n, c=200: np.log1p(n) / np.log1p(c)
     sig = lambda mu, s: (lambda n: 1 / (1 + np.exp(-(n - mu) / s)))
     variants = [('baseline', None, None, 0)]
-    for col in ('n_inl', 'n_inl_fg', 'n_lg_fg'):
+    for col in [c for c in ('n_inl', 'n_inl_fg', 'n_lg_fg', 'sift_inl', 'sift_inl_fg') if c in cols]:
         for w in (0.05, 0.1, 0.2, 0.4): variants.append((f'{col} log1p/log1p(200)', col, log, w))
     for w in (0.1, 0.2): variants.append(('n_inl_fg sigmoid(mu=25,s=8)', 'n_inl_fg', sig(25, 8), w))
     for w in (0.1, 0.2): variants.append(('n_inl_fg sigmoid(mu=50,s=15)', 'n_inl_fg', sig(50, 15), w))
@@ -91,6 +128,8 @@ def fuse():
     lines.append(f'# w5: local feature re-ranking (DISK {int(z["nfeat"])} kpts + LightGlue, K={int(z["K"])})\n')
     lines.append(f'{len(P)} candidate pairs; features {tf:.0f}s for {len(np.unique(P))} crops; matching {tm:.0f}s for {nt} pairs '
                  f'= {1000 * tm / max(nt, 1):.0f} ms/pair (CPU, 4 threads, + F-matrix MAGSAC)\n')
+    if 'sift_scores' in z: lines.append(f"RootSIFT variant: features {float(z['sift_t_feat']):.0f}s, matching {float(z['sift_t_match']):.0f}s = "
+                                        f"{1000 * float(z['sift_t_match']) / len(P):.1f} ms/pair\n")
     lines.append('| variant | w | top1 | mAP | set top1 | set top3 | wv F1 | SIM | +recency |\n|---|---|---|---|---|---|---|---|---|')
     pc = {}
     for name, col, f, w in variants:
@@ -126,4 +165,5 @@ def fuse():
 
 if __name__ == '__main__':
     if sys.argv[1] == 'match': match(int(sys.argv[2]) if len(sys.argv) > 2 else 30)
+    elif sys.argv[1] == 'sift': match_sift()
     else: fuse()

@@ -41,7 +41,7 @@ for i, d in enumerate(dets):
                   'col': CNAMES[int(c.argmax())] if c.max() > 0.004 else ''})
 log = json.load(open(os.path.join(ROOT, 'results/log.json')))
 extra = {}
-for f in ('detector_bench.json', 'notes.json', 'suspects.json', 'by_coat.json', 'pipeline_v27.json', 'listing.json'):
+for f in ('detector_bench.json', 'notes.json', 'suspects.json', 'by_coat.json', 'pipeline_v27.json'):
     p = os.path.join(ROOT, 'results', f)
     if os.path.exists(p): extra[f[:-5]] = json.load(open(p))
 emb_meta = {}

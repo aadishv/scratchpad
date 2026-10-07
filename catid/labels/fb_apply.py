@@ -40,7 +40,6 @@ letters = {}
 for k, d in cat_fb.items():
     for L, name in re.findall(r'\b([A-D])\s*=\s*([^;,\n]+)', d.get('note', '')): letters[(k, L)] = name.strip()
 for did, d in load_dir('crop_fb').items():
-    if d.get('listing'): lab[did] = d['listing']; st['listing_mark'] += 1; continue   # tapped on the Adoption site tab
     L = d.get('split'); cat = d.get('cat')
     if L and (cat, L) in letters: lab[did] = letters[(cat, L)]; st['split_relabel'] += 1
     elif L: lab[did] = f'{cat}_{L}'; st['split_unnamed'] += 1

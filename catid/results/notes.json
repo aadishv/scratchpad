@@ -33,8 +33,8 @@
  ],
  "findings": [
   {
-   "title": "The shelter's own listings are a free labeled gallery",
-   "body": "The Palo Alto adoption page is a Shelterluv feed: 30 not-yet-adopted cats with sex, birthday, intake date and 1 to 6 official photos. Sex checks the collar code (Nacho female and pink; Dawn, Casper and McFlurry male and blue, all consistent). The intake date rules out sightings before a cat arrived. The photos work as a cross-domain gallery: one listing photo picks the right cat among the 35 in your photos 61% of the time, and has it in the top 3 81% of the time (DINOv2-B, each domain centered separately), with nothing learned from your photos. The new Adoption site tab shows each listed cat next to its closest crops so you can tap to name them. Leads: Toast (a tortie littermate of Microwave and Smoothie) matches the Sep 28 tortie kitten at 0.82, which you named Scythe. Unidentified orange kittens from early September may be Cheeto and Dorito."
+   "title": "Shelter listings as a reference: dropped",
+   "body": "Matching the shelter's current adoption listings against your photos mostly paired old, since-adopted caf\u00e9 cats with newer listed cats that merely look similar (Toast came after Scythe was adopted and looks different). A listing only shows who is available now, not who was at the caf\u00e9 on a given day, so it is out of the pipeline for now."
   },
   {
    "title": "The big models barely help; animal re-ID models lose",

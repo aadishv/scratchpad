@@ -147,6 +147,10 @@
   {
    "title": "Building the roster with no labels at all: F1 0.67",
    "body": "Clustering all 398 labeled-cat crops from all 28 visits at once, with no labels (DINOv2-B + recipe + query expansion, average linkage, same-photo cannot-link): B-cubed F1 0.67, ARI 0.60, 63 clusters for 35 real cats. Clusters are mostly pure (precision 0.75) but cats split across visits (recall 0.60). So the system could propose a roster from scratch that you mainly merge, rather than having to un-mix it."
+  },
+  {
+   "title": "Forcing one cat per group within a visit doesn't help",
+   "body": "Making assignment within a visit one-to-one (Hungarian matching, so two groups cannot both claim the same known cat) slightly lowered set-level top-1 from 0.74 to 0.72. New cats' groups steal known cats' names under the constraint. A learned new-vs-known classifier over cluster features (score, margin, size, days since last seen, collar agreement) also did not beat a tuned threshold. The vision-model 'none of these' answer is the better new-cat signal."
   }
  ],
  "next": [

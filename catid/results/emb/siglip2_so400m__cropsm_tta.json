@@ -1,0 +1,1 @@
+{"model": "siglip2_so400m", "variant": "cropsm", "tta": true, "n": 975, "sec": 2760.9481613636017, "ms_per_crop": 2831.7417039626685, "dim": 1152}

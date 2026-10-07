@@ -58,7 +58,7 @@ def main():
     ap.add_argument('photos'); ap.add_argument('--roster'); ap.add_argument('--out', default='pipeline_out')
     ap.add_argument('--det', default='yolo11n-seg.pt'); ap.add_argument('--imgsz', type=int, default=640)
     ap.add_argument('--emb', default='dinov2_s'); ap.add_argument('--threads', type=int, default=4)
-    ap.add_argument('--cluster-thr', type=float, default=0.7); ap.add_argument('--new-thr', type=float, default=0.55)
+    ap.add_argument('--cluster-thr', type=float, default=0.7); ap.add_argument('--new-thr', type=float, default=0.71)  # calibrated: balanced known/new on labels v5 (DINOv2-S, QE, best-match scoring)
     ap.add_argument('--files', nargs='*', help='subset of file names to process')
     a = ap.parse_args()
     torch.set_num_threads(a.threads)
@@ -103,6 +103,11 @@ def main():
         ts = np.array([common.ts(m['file']).timestamp() for m in meta]); nper = np.array([sum(x['file'] == m['file'] for x in meta) for m in meta])
         import heuristics as H
         Ec = H.tracklet_pool(Ec, H.bursts(ts, np.zeros(len(meta), int), nper), alpha=0.5)
+        if R is not None and len(Ec):
+            # alpha query expansion over this visit + the roster (transductive, no labels): +4 points top-1 online
+            import graph as G
+            Rc0 = R['emb'] - mu; Rc0 /= np.linalg.norm(Rc0, axis=1, keepdims=True)
+            U = G.alpha_qe(np.vstack([Ec, Rc0]), k=5, alpha=3.0); Ec, Rq = U[:len(Ec)], U[len(Ec):]
         Sv = Ec @ Ec.T + 0.1 * csim(has, dom, has, dom)
         from sklearn.cluster import AgglomerativeClustering
         if len(meta) > 1:
@@ -113,12 +118,13 @@ def main():
         for g in np.unique(grp):
             idx = np.nonzero(grp == g)[0]; sug = []
             if R is not None:
-                Rc = R['emb'] - mu; Rc /= np.linalg.norm(Rc, axis=1, keepdims=True)
+                Rc = Rq
                 Sr = Ec[idx] @ Rc.T + 0.1 * csim(has[idx], dom[idx], R['collar_has'], R['collar_dom'])
                 now = ts[idx].min() / 86400
                 for name in np.unique(R['label']):
-                    cols = np.nonzero(R['label'] == name)[0]; k = min(3, len(cols))
-                    sc = np.sort(Sr[:, cols], axis=1)[:, -k:].mean() + 0.1 * np.exp(-(now - R['day'][cols].max()) / 21)
+                    cols = np.nonzero(R['label'] == name)[0]
+                    # each photo's single best match in the cat's history, averaged over the group (best set-level rule)
+                    sc = Sr[:, cols].max(1).mean() + 0.1 * np.exp(-(now - R['day'][cols].max()) / 21)
                     sug.append((float(sc), str(name)))
                 sug.sort(reverse=True)
             top = sug[:3]

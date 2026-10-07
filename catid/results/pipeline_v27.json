@@ -2,26 +2,50 @@
  "photos": 35,
  "crops": 33,
  "timing_s": {
-  "load models": 3.52,
+  "load models": 0.83,
   "decode": 1.31,
-  "detect": 8.3,
-  "dedupe+collar": 1.0,
-  "crop": 0.56,
-  "embed": 8.82,
-  "group+match": 0.2
+  "detect": 8.67,
+  "dedupe+collar": 1.09,
+  "crop": 0.43,
+  "embed": 9.38,
+  "group+match": 0.29
  },
  "ms_per_photo": {
   "decode": 37.5,
-  "detect": 237.1,
-  "dedupe+collar": 28.5,
-  "crop": 15.9,
-  "embed": 252.0,
-  "group+match": 5.6
+  "detect": 247.7,
+  "dedupe+collar": 31.0,
+  "crop": 12.3,
+  "embed": 267.9,
+  "group+match": 8.3
  },
- "ms_per_photo_total": 576.6,
+ "ms_per_photo_total": 604.7,
  "groups": [
   {
    "group": 0,
+   "crops": [
+    12,
+    30,
+    31,
+    32
+   ],
+   "suggest": [
+    {
+     "cat": "Delilah",
+     "score": 0.924
+    },
+    {
+     "cat": "Yoplait",
+     "score": 0.561
+    },
+    {
+     "cat": "Shovel",
+     "score": 0.445
+    }
+   ],
+   "call": "Delilah"
+  },
+  {
+   "group": 1,
    "crops": [
     2,
     3,
@@ -36,43 +60,19 @@
    ],
    "suggest": [
     {
-     "cat": "Bean",
-     "score": 0.536
+     "cat": "Sox",
+     "score": 0.636
     },
     {
-     "cat": "TabbyLime",
-     "score": 0.491
+     "cat": "Paprika",
+     "score": 0.566
     },
     {
-     "cat": "TabbyWhiteAdult",
-     "score": 0.469
+     "cat": "Gobi Bear",
+     "score": 0.538
     }
    ],
    "call": "NEW"
-  },
-  {
-   "group": 1,
-   "crops": [
-    12,
-    30,
-    31,
-    32
-   ],
-   "suggest": [
-    {
-     "cat": "FluffyCalico",
-     "score": 0.794
-    },
-    {
-     "cat": "CalicoTabbyWin",
-     "score": 0.465
-    },
-    {
-     "cat": "OrangeYellow",
-     "score": 0.418
-    }
-   ],
-   "call": "FluffyCalico"
   },
   {
    "group": 2,
@@ -92,43 +92,22 @@
    ],
    "suggest": [
     {
-     "cat": "OrangeYellow",
-     "score": 0.656
+     "cat": "Shovel",
+     "score": 0.802
     },
     {
-     "cat": "OrangePink",
-     "score": 0.57
+     "cat": "Papaya",
+     "score": 0.592
     },
     {
-     "cat": "OrangeWhite",
-     "score": 0.461
+     "cat": "Nacho",
+     "score": 0.568
     }
    ],
-   "call": "OrangeYellow"
+   "call": "Shovel"
   },
   {
    "group": 3,
-   "crops": [
-    27
-   ],
-   "suggest": [
-    {
-     "cat": "Jade",
-     "score": 0.41
-    },
-    {
-     "cat": "TuxPink",
-     "score": 0.334
-    },
-    {
-     "cat": "BlackYellow",
-     "score": 0.297
-    }
-   ],
-   "call": "NEW"
-  },
-  {
-   "group": 4,
    "crops": [
     0,
     26,
@@ -137,15 +116,36 @@
    "suggest": [
     {
      "cat": "Rocky",
-     "score": 0.308
+     "score": 0.424
     },
     {
-     "cat": "Jade",
-     "score": 0.261
+     "cat": "Midnight",
+     "score": 0.386
     },
     {
-     "cat": "TuxBlue_v11",
-     "score": 0.24
+     "cat": "Cosmo",
+     "score": 0.291
+    }
+   ],
+   "call": "NEW"
+  },
+  {
+   "group": 4,
+   "crops": [
+    27
+   ],
+   "suggest": [
+    {
+     "cat": "Paddington Bear",
+     "score": 0.457
+    },
+    {
+     "cat": "Brownie",
+     "score": 0.442
+    },
+    {
+     "cat": "Rocky",
+     "score": 0.319
     }
    ],
    "call": "NEW"
@@ -158,19 +158,19 @@
    ],
    "suggest": [
     {
-     "cat": "LynxPoint",
-     "score": 0.61
+     "cat": "Moon Bear",
+     "score": 0.83
     },
     {
-     "cat": "WhiteKit",
-     "score": 0.575
+     "cat": "Casper",
+     "score": 0.744
     },
     {
-     "cat": "Siamese",
-     "score": 0.492
+     "cat": "Sylph",
+     "score": 0.726
     }
    ],
-   "call": "LynxPoint"
+   "call": "Moon Bear"
   },
   {
    "group": 6,
@@ -179,19 +179,19 @@
    ],
    "suggest": [
     {
-     "cat": "Jade",
-     "score": 0.682
+     "cat": "Brownie",
+     "score": 0.711
     },
     {
-     "cat": "BlackYellow",
-     "score": 0.494
+     "cat": "Rocky",
+     "score": 0.67
     },
     {
-     "cat": "BlackBlue",
-     "score": 0.478
+     "cat": "Onyx",
+     "score": 0.662
     }
    ],
-   "call": "Jade"
+   "call": "Brownie"
   }
  ],
  "crops_meta": [

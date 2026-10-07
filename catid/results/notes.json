@@ -13,7 +13,7 @@
   {
    "stage": "Hand labels",
    "state": "done",
-   "detail": "Labels v3 after your review: 525 crops across 53 cats; rejected links dropped. Name any cat you know in the Roster tab."
+   "detail": "Labels v4: your names (as merges) and the CalicoKitYellow split applied, 46 cats. Use Flag / note and Split into cats in the Roster tab for any other mixed group."
   },
   {
    "stage": "Embeddings",
@@ -32,6 +32,10 @@
   }
  ],
  "findings": [
+  {
+   "title": "Your names merged 7 groups; one group was 3 cats",
+   "body": "You gave 39 names. Seven names appeared on two or three of my groups, so those are now one cat each: Jade, Papaya, Sox, Paprika, Scythe, Midnight, Dawn. CalicoKitYellow was three cats: a tabby-calico kitten with a pink collar, a calico kitten with a yellow 'Calli...' collar, and Yoplait (the adult in the basket). Labels v4: 46 cats, 525 crops. The merges add longer-gap matches (for example Papaya in April and July), so scores dip slightly. Averaging DINOv2-B and -S gives cross-visit top-1 0.57, and the right cat is in the top 3 for 95% of known-cat crops."
+  },
   {
    "title": "Your review: 33 of my 73 uncertain links were right",
    "body": "You confirmed 33 cross-visit links and rejected 40, so my guesses about which kitten grew into which cat were barely better than a coin flip. The rejected ones are dropped for now, as you suggested. Of the 30 'model disagrees with my label' pairs, 3 were the same cat. With your names, BlackBlue and SmokeKit are Onyx, and OrangeYellow is Shovel. Labels v3: 525 crops across 53 cats, 4 uncertain links left. On these cleaner labels, for a cat seen before, the right one is in the top 3 suggestions 94 to 96% of the time (87% on my labels), and top-1 is 0.53."

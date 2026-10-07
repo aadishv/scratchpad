@@ -89,6 +89,12 @@ table.presence tr:hover td { background: var(--chip) }
 .sp.flag::after { content: "✕"; position: absolute; top: 2px; right: 3px; font: 700 12px var(--body); color: #fff; background: var(--bad); border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center }
 .sp.ok::after { content: "✓"; position: absolute; top: 2px; right: 3px; font: 700 11px var(--body); color: #fff; background: var(--good); border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center }
 .sp.big { width: 128px; height: 128px }
+.sp .badge { position: absolute; left: 3px; top: 3px; font: 700 12px var(--mono); color: #fff; background: var(--pink); border-radius: 4px; padding: 1px 5px }
+.cat.flagged { border-color: var(--warn); box-shadow: inset 4px 0 0 var(--warn) }
+.cat-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 2px 0 10px }
+.cat-tools .btn { padding: 4px 10px; font-size: 12.5px }
+.flagbox { display: grid; gap: 8px; margin: 0 0 10px; max-width: 560px }
+.splithelp { font-size: 13px; color: var(--pink); margin: 0 0 8px }
 .more { font: 500 13px var(--body); color: var(--blue); background: none; border: 0; cursor: pointer; padding: 6px 0 0 }
 .vgroup { margin-top: 8px }
 .vgroup .label { margin-bottom: 4px; display: block }
@@ -182,7 +188,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
       <span><i class="sw"></i> confident</span>
       <span><i class="sw u"></i> uncertain link to this cat</span>
       <span><i class="sw d"></i> duplicate detection</span>
-      <span>Type a real name next to any cat you know (it saves when you leave the field). Click a crop to mark it right or wrong.</span>
+      <span>Type a real name next to any cat you know (saves when you leave the field). Use Flag / note when a group looks wrong, and Split into cats when it is several cats.</span>
     </div>
     <div class="cats" id="cats"></div>
   </section>
@@ -251,13 +257,16 @@ $('#updated').textContent = 'Updated ' + DATA.updated;
 
 // ---------- feedback state (db) ----------
 const FB = { crop: {}, group: {}, pair: {}, names: {}, notes: [] };
+const SPLIT = ['A', 'B', 'C', 'D'];
+const splitMode = new Set();
+const sid = n => String(n).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
 const KNOWN_NAMES = DATA.names || {};
-const disp = n => FB.names[n]?.name || KNOWN_NAMES[n] || n;
+const disp = n => FB.names[sid(n)]?.name || KNOWN_NAMES[n] || n;
 let db = null, canWrite = true;
 const rerenders = new Set();
 function refresh() { for (const f of rerenders) f(); }
 
-function sprite(c, size = 76) {
+function sprite(c, size = 76, opts = {}) {
   const per = DATA.per, a = Math.floor(c.i / (per * per)), j = c.i % (per * per);
   const b = el('button', { class: 'sp', 'aria-label': `Crop ${c.id}, labeled ${c.lab}` });
   b.style.width = b.style.height = size + 'px';
@@ -267,8 +276,9 @@ function sprite(c, size = 76) {
   if (c.lab.endsWith('~')) b.classList.add('unsure');
   if (!c.p) b.classList.add('dup');
   const fb = FB.crop[c.id];
-  if (fb) b.classList.add(fb.verdict === 'ok' ? 'ok' : 'flag');
-  b.addEventListener('click', () => openCrop(c));
+  if (fb?.verdict) b.classList.add(fb.verdict === 'ok' ? 'ok' : 'flag');
+  if (fb?.split) b.append(el('span', { class: 'badge', text: fb.split }));
+  b.addEventListener('click', () => { const cat = base(c.lab); splitMode.has(cat) && opts.split ? cycleSplit(c, cat) : openCrop(c); });
   return b;
 }
 
@@ -326,6 +336,7 @@ const firstSeen = n => Math.min(...byCat[n].map(c => c.v));
 let sortBy = 'last';
 const lastSeen = n => Math.max(...byCat[n].map(c => c.v));
 const expanded = new Set();
+const expandedFlag = new Set();
 document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { sortBy = b.dataset.sort; document.querySelectorAll('[data-sort]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderCats(); }));
 $('#q').addEventListener('input', () => renderCats());
 for (const n of cats.sort()) $('#catnames').append(el('option', { value: n }));
@@ -339,27 +350,45 @@ function renderCats() {
     const cols = {}; cs.forEach(c => { if (c.col) cols[c.col] = (cols[c.col] || 0) + 1; });
     const colTxt = Object.entries(cols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ×${v}`).join(', ');
     const nm = el('input', { class: 'txt', id: 'name-' + n, placeholder: 'Real name?', 'aria-label': `Real name for ${n}`, style: 'width:150px;padding:5px 8px' });
-    nm.value = FB.names[n]?.name || '';
+    nm.value = FB.names[sid(n)]?.name || ((DATA.named || []).includes(n) ? n : '');
     if (!canWrite) nm.disabled = true;
-    nm.addEventListener('change', () => { const v = nm.value.trim(); if (v !== (FB.names[n]?.name || '')) saveName(n, v); });
+    nm.addEventListener('change', () => { const v = nm.value.trim(); if (v !== (FB.names[sid(n)]?.name || '')) saveCat(n, { name: v }); });
     const head = el('div', { class: 'cat-head' }, el('h3', { text: disp(n) }), disp(n) !== n ? el('span', { class: 'meta', text: `(${n})` }) : null,
       el('span', { class: 'meta', text: `${cs.length} crops · ${vs.length} visits · last seen ${vById[Math.max(...vs)].date}` + (colTxt ? ` · collar: ${colTxt}` : '') }), nm);
     const strip = el('div', { class: 'vstrip' });
     for (const v of visits) { const here = cs.filter(c => c.v === v.v); if (!here.length) continue; strip.append(el('span', { class: here.every(c => c.lab.endsWith('~')) ? 'unsure' : 'on', text: v.date })); }
-    const card = el('div', { class: 'cat' }, head, strip);
+    const cf = FB.names[sid(n)] || {};
+    const card = el('div', { class: 'cat' + (cf.mixed || cf.note ? ' flagged' : '') }, head, strip);
+    const tools = el('div', { class: 'cat-tools' });
+    const flagOpen = expandedFlag.has(n);
+    tools.append(el('button', { class: 'btn', text: cf.note || cf.mixed ? 'Edit flag / note' : 'Flag / note', onclick: () => { flagOpen ? expandedFlag.delete(n) : expandedFlag.add(n); renderCats(); } }));
+    tools.append(el('button', { class: 'btn' + (splitMode.has(n) ? ' primary' : ''), text: splitMode.has(n) ? 'Done splitting' : 'Split into cats', onclick: () => { splitMode.has(n) ? splitMode.delete(n) : (splitMode.add(n), expanded.add(n)); renderCats(); } }));
+    if (cf.mixed) tools.append(el('span', { class: 'pill running', text: 'flagged: several cats' }));
+    if (cf.note && !flagOpen) tools.append(el('span', { class: 'meta', text: '“' + cf.note + '”' }));
+    card.append(tools);
+    if (flagOpen) {
+      const ta = el('textarea', { id: 'note-' + sid(n), placeholder: 'What is wrong with this group? e.g. “this is two cats: the one with the pink collar is Nacho”', style: 'min-height:64px' }); ta.value = cf.note || '';
+      const mixed = el('button', { class: 'btn' + (cf.mixed ? ' sel-no' : ''), text: cf.mixed ? 'Marked: several cats' : 'This group mixes several cats' });
+      mixed.addEventListener('click', () => saveCat(n, { mixed: !cf.mixed }));
+      const save = el('button', { class: 'btn primary', text: 'Save note' });
+      save.addEventListener('click', () => { saveCat(n, { note: ta.value.trim() }); expandedFlag.delete(n); renderCats(); });
+      if (!canWrite) [ta, mixed, save].forEach(x => x.disabled = true);
+      card.append(el('div', { class: 'flagbox' }, ta, el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, mixed, save)));
+    }
+    if (splitMode.has(n)) card.append(el('p', { class: 'splithelp', text: 'Tap each crop to sort it: A → B → C → D → none. Crops left without a letter stay as they are.' }));
     const open = expanded.has(n);
     const show_ = open ? cs : cs.slice(0, 24);
-    const grid = el('div', { class: 'crops' }); show_.forEach(c => grid.append(sprite(c)));
+    const grid = el('div', { class: 'crops' }); show_.forEach(c => grid.append(sprite(c, 76, { split: true })));
     card.append(grid);
     if (cs.length > 24) card.append(el('button', { class: 'more', text: open ? 'Show fewer' : `Show all ${cs.length}`, onclick: () => { open ? expanded.delete(n) : expanded.add(n); renderCats(); } }));
     box.append(card);
   }
 }
-renderCats(); rerenders.add(() => { if (!document.activeElement?.id?.startsWith('name-')) renderCats(); });
+renderCats(); rerenders.add(() => { const a = document.activeElement?.id || ''; if (!a.startsWith('name-') && !a.startsWith('note-')) renderCats(); });
 
 // ---------- review: uncertain links ----------
 const groups = {};
-for (const c of labeled) { const k = base(c.lab) + '__v' + c.v; (groups[k] ||= { cat: base(c.lab), v: c.v, cs: [] }).cs.push(c); }
+for (const c of labeled) { const k = sid(base(c.lab)) + '__v' + c.v; (groups[k] ||= { cat: base(c.lab), v: c.v, cs: [] }).cs.push(c); }
 const unsureGroups = Object.entries(groups).filter(([k, g]) => g.cs.every(c => c.lab.endsWith('~'))).sort((a, b) => a[1].v - b[1].v);
 // ---------- ask Claude (vision second opinion, on the viewer's own Claude usage) ----------
 let sample = null;
@@ -383,7 +412,7 @@ async function askClaude(key, left, right, leftName, rightName) {
       `Are the two groups the same individual cat? Reply as JSON: {"verdict": "same" | "different" | "unsure", "confidence": 0-1, "reason": "one or two sentences naming the decisive features"}`;
     const r = await sample.json(prompt, { images, modelTier: 'default' });
     askState[key] = { status: 'done', r };
-    try { await db?.collection('claude_fb').doc(key).set({ verdict: String(r.verdict), confidence: Number(r.confidence) || 0, reason: String(r.reason || ''), at: new Date().toISOString() }); } catch (e) {}
+    try { await db?.collection('claude_fb').doc(sid(key)).set({ verdict: String(r.verdict), confidence: Number(r.confidence) || 0, reason: String(r.reason || ''), at: new Date().toISOString() }); } catch (e) {}
   } catch (e) {
     const msg = { not_granted: 'Claude was not allowed for this page.', rate_limited: 'Too many requests right now. Try again in a minute.', images_unavailable: "This view can't send images to Claude." }[e?.code] || "Claude couldn't answer this time.";
     askState[key] = { status: 'error', text: msg };
@@ -417,7 +446,7 @@ function renderLinks() {
       ask.append(b);
     }
     const L = anchor.slice(0, 4), Rr = g.cs.filter(c => c.p).slice(0, 4);
-    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'pair' }, left, right), ask, L.length ? claudeBox('g_' + k, L, Rr, g.cat + ' (confident visits)', `possibly ${g.cat} (${vById[g.v].date})`) : null));
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'pair' }, left, right), ask, L.length ? claudeBox('g_' + sid(k), L, Rr, g.cat + ' (confident visits)', `possibly ${g.cat} (${vById[g.v].date})`) : null));
   }
   $('#qcount').textContent = open ? `(${open})` : '';
 }
@@ -435,7 +464,7 @@ function renderSuspects() {
       if (!canWrite) btn.disabled = true;
       btn.addEventListener('click', () => savePair(k, val, p)); ask.append(btn);
     }
-    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'crops' }, sprite(a, 128), sprite(b, 128)), ask, claudeBox('p_' + k, [a], [b], base(p.la), base(p.lb))));
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'crops' }, sprite(a, 128), sprite(b, 128)), ask, claudeBox('p_' + sid(k), [a], [b], base(p.la), base(p.lb))));
   }
 }
 async function savePair(k, val, p) {
@@ -479,15 +508,23 @@ $('#dlg-save').addEventListener('click', async () => { const name = $('#dlg-name
 
 // ---------- writes ----------
 async function saveCrop(c, body) {
-  FB.crop[c.id] = { ...body, label: c.lab }; refresh();
+  FB.crop[c.id] = { ...(FB.crop[c.id] || {}), ...body, label: c.lab }; refresh();
   if (!db) return;
-  try { await db.collection('crop_fb').doc(c.id).set({ ...body, label: c.lab, at: new Date().toISOString() }); }
+  try { await db.collection('crop_fb').doc(c.id).set({ ...FB.crop[c.id], at: new Date().toISOString() }); }
   catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
 }
-async function saveName(cat, name) {
-  FB.names[cat] = { name }; refresh();
+async function saveCat(cat, patch) {
+  const k = sid(cat); const doc = { ...(FB.names[k] || {}), ...patch, label: cat, at: new Date().toISOString() };
+  FB.names[k] = doc; refresh();
   if (!db) return;
-  try { await db.collection('cat_fb').doc(cat).set({ name, at: new Date().toISOString() }); }
+  try { await db.collection('cat_fb').doc(k).set(doc); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
+async function cycleSplit(c, cat) {
+  const cur = FB.crop[c.id]?.split || ''; const next = SPLIT[(SPLIT.indexOf(cur) + 1)] || '';
+  FB.crop[c.id] = { ...(FB.crop[c.id] || {}), split: next, cat }; refresh();
+  if (!db) return;
+  try { await db.collection('crop_fb').doc(c.id).set({ ...(FB.crop[c.id] || {}), split: next, cat, label: c.lab, at: new Date().toISOString() }); }
   catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
 }
 async function saveGroup(k, val) {

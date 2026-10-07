@@ -42,7 +42,7 @@
   },
   {
    "title": "Current best recipe",
-   "body": "DINOv2 (B or S) on the plain crop, centered, burst shots pooled, plus the collar code and a zero-shot coat-pattern gate. On labels v3: cross-visit top-1 about 0.53, and known-cat top-3 0.94 (B) to 0.96 (S). The hard part remains 'new cat or known cat': balanced end-to-end about 0.65."
+   "body": "DINOv2 on the plain crop, centered, burst shots pooled, plus the collar code and a zero-shot coat-pattern gate. On labels v3, single model: DINOv2-B top-1 0.54 and known-cat top-3 0.94; DINOv2-S top-1 0.53 and top-3 0.96 at a quarter of the cost. Averaging DINOv2-B and -S gives the best top-1 so far, 0.58. Adding MegaDescriptor-T gives the best end-to-end balance (0.69), with the right cat in the top 3 for 96% of known-cat crops."
   },
   {
    "title": "Patterned cats are easy, black cats and tabbies are hard",

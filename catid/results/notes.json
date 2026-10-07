@@ -143,6 +143,10 @@
   {
    "title": "Patch pooling, including only the cat's own patches, loses to the CLS token",
    "body": "A helper compared DINOv2-B's CLS token against mean and GeM pooling of patch tokens, and against pooling only the patches inside the cat mask. CLS on the plain crop is best (top-1 0.49 on the v1 labels). Mask-weighted pooling beats plain pooling (0.39 to 0.41 vs 0.27) but never beats CLS, and CLS plus mask-mean ties CLS."
+  },
+  {
+   "title": "Building the roster with no labels at all: F1 0.67",
+   "body": "Clustering all 398 labeled-cat crops from all 28 visits at once, with no labels (DINOv2-B + recipe + query expansion, average linkage, same-photo cannot-link): B-cubed F1 0.67, ARI 0.60, 63 clusters for 35 real cats. Clusters are mostly pure (precision 0.75) but cats split across visits (recall 0.60). So the system could propose a roster from scratch that you mainly merge, rather than having to un-mix it."
   }
  ],
  "next": [

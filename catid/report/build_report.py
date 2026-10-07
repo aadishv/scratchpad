@@ -11,7 +11,7 @@ os.makedirs(out, exist_ok=True)
 CELL, PER = 128, 16  # 16x16 cells per atlas
 
 dets, times, sess = common.load(work)
-lab = json.load(open(os.path.join(ROOT, 'labels/labels_v4.json')))
+lab = json.load(open(os.path.join(ROOT, 'labels/labels_v5.json')))
 primary = np.load(f'{work}/primary.npy')
 collar = np.load(f'{work}/collar.npy')
 from collar import NAMES as CNAMES

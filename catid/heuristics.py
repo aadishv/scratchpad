@@ -84,10 +84,11 @@ def collar_compat(C, times, sess, floor=0.004, names=('pink', 'red', 'yellowgree
         for j in np.nonzero(has)[0]:
             a, b = col[i], col[j]
             if a == b: M[i, j] = same
-            elif sess[i] == sess[j]: M[i, j] = impossible
             elif {a, b} == {'pink', 'blue'}: M[i, j] = impossible
             elif 'yellowgreen' in (a, b) and ({a, b} & {'pink', 'blue'}):
+                # adoption: pink/blue -> yellow, possibly during a visit (Callie, Oct 6), never back
                 y, o = (i, j) if a == 'yellowgreen' else (j, i)
                 M[i, j] = adopt if times[y] > times[o] else impossible
+            elif sess[i] == sess[j]: M[i, j] = impossible
             else: M[i, j] = other_diff
     return M

@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common, evaluate as ev, heuristics as H
 
 WORK = os.environ.get('WORK', '/home/user/data/work')
-LAB = os.environ.get('LABELS', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'labels/labels_v4.json'))
+LAB = os.environ.get('LABELS', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'labels/labels_v5.json'))
 dets, times, sess = common.load(WORK)
 files = [d['file'] for d in dets]
 lab = json.load(open(LAB)); raw = np.array([lab[d['id']] for d in dets])

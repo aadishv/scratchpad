@@ -13,7 +13,7 @@
   {
    "stage": "Hand labels",
    "state": "done",
-   "detail": "Labels v4: your names (as merges) and the CalicoKitYellow split applied, 46 cats. Use Flag / note and Split into cats in the Roster tab for any other mixed group."
+   "detail": "Labels v5: 34 cats, 483 crops after three review rounds (links, names, splits) and the Jul 7 cutoff."
   },
   {
    "stage": "Embeddings",
@@ -32,6 +32,10 @@
   }
  ],
  "findings": [
+  {
+   "title": "Round 3: splits, a mid-visit adoption, and the Jul 7 cutoff",
+   "body": "Your split letters relabeled 40 crops. Bean was really Gobi Bear and Sox; the white-cat groups were Sylph, Casper and Mister Buttons; CalicoKit was Callie and Casper. You named both calico kittens from Oct 6 Callie. Her collar is pink at 4:13 pm and yellow at 4:34 pm, so she was adopted during that visit. The collar rule now allows pink or blue to yellow within one visit too, never back. TuxYellow is Paddington Bear after adoption. Cats last seen on or before Jul 7 are cut (Jade, Martha, Shayla and three unnamed early kittens). Labels v5: 34 cats, 483 crops. Within-visit grouping F1 rose to 0.89. Known-cat top-3 fell to 0.84 to 0.88, because the white-kitten and tabby splits separate cats the model was treating as one. That is the honest number now."
+  },
   {
    "title": "Your names merged 7 groups; one group was 3 cats",
    "body": "You gave 39 names. Seven names appeared on two or three of my groups, so those are now one cat each: Jade, Papaya, Sox, Paprika, Scythe, Midnight, Dawn. CalicoKitYellow was three cats: a tabby-calico kitten with a pink collar, a calico kitten with a yellow 'Calli...' collar, and Yoplait (the adult in the basket). Labels v4: 46 cats, 525 crops. The merges add longer-gap matches (for example Papaya in April and July), so scores dip slightly. Averaging DINOv2-B and -S gives cross-visit top-1 0.57, and the right cat is in the top 3 for 95% of known-cat crops."

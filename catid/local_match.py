@@ -67,7 +67,8 @@ def match(K=30):
         inl = np.zeros(len(m), bool)
         if len(m) >= 8:
             p0 = a['kp'][m[:, 0]].numpy(); p1 = b['kp'][m[:, 1]].numpy()
-            _, msk = cv2.findFundamentalMat(p0, p1, cv2.USAC_MAGSAC, 3.0, 0.999, 2000)
+            try: _, msk = cv2.findFundamentalMat(p0, p1, cv2.USAC_MAGSAC, 3.0, 0.999, 2000)
+            except cv2.error: msk = None  # degenerate point sets
             if msk is not None: inl = msk.ravel().astype(bool)
         done[(int(i), int(j))] = np.array([len(m), inl.sum(), fgm.sum(), (inl & fgm).sum(), c.sum()], np.float32)
         n_new += 1
@@ -101,7 +102,8 @@ def match_sift():
         m = np.array([(a.queryIdx, a.trainIdx) for a, b in mm if a.distance < 0.8 * b.distance and back.get(a.trainIdx) == a.queryIdx]).reshape(-1, 2)
         fgm = f0[m[:, 0]] & f1[m[:, 1]] if len(m) else np.zeros(0, bool); inl = np.zeros(len(m), bool)
         if len(m) >= 8:
-            _, msk = cv2.findFundamentalMat(x0[m[:, 0]], x1[m[:, 1]], cv2.USAC_MAGSAC, 3.0, 0.999, 2000)
+            try: _, msk = cv2.findFundamentalMat(x0[m[:, 0]], x1[m[:, 1]], cv2.USAC_MAGSAC, 3.0, 0.999, 2000)
+            except cv2.error: msk = None  # degenerate point sets
             if msk is not None: inl = msk.ravel().astype(bool)
         out[k] = [len(m), inl.sum(), fgm.sum(), (inl & fgm).sum()]
     t_match = time.time() - t0

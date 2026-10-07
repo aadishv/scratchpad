@@ -11,7 +11,7 @@ os.makedirs(out, exist_ok=True)
 CELL, PER = 128, 16  # 16x16 cells per atlas
 
 dets, times, sess = common.load(work)
-lab = json.load(open(os.path.join(ROOT, 'labels/labels_v1.json')))
+lab = json.load(open(os.path.join(ROOT, 'labels/labels_v2.json')))
 primary = np.load(f'{work}/primary.npy')
 collar = np.load(f'{work}/collar.npy')
 from collar import NAMES as CNAMES
@@ -41,7 +41,7 @@ for i, d in enumerate(dets):
                   'col': CNAMES[int(c.argmax())] if c.max() > 0.004 else ''})
 log = json.load(open(os.path.join(ROOT, 'results/log.json')))
 extra = {}
-for f in ('detector_bench.json', 'notes.json'):
+for f in ('detector_bench.json', 'notes.json', 'suspects.json'):
     p = os.path.join(ROOT, 'results', f)
     if os.path.exists(p): extra[f[:-5]] = json.load(open(p))
 emb_meta = {}

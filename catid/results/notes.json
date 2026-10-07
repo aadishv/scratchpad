@@ -13,7 +13,7 @@
   {
    "stage": "Hand labels",
    "state": "done",
-   "detail": "First pass: 652 crops named across 56 cats; 320 marked unidentifiable; 3 false detections. Needs your review."
+   "detail": "Labels v2: 652 crops across 54 cats after fixing 4 mistakes the model found. 321 unidentifiable. Needs your review."
   },
   {
    "stage": "Embeddings",
@@ -28,16 +28,28 @@
  ],
  "findings": [
   {
+   "title": "Current best: the right cat is in the top 3 suggestions 87% of the time",
+   "body": "Recipe: DINOv2-B on the plain crop (no background masking), centered, burst shots pooled, plus collar colour and a zero-shot coat-pattern gate. For a cluster of today's photos of a cat that has been seen before, the right name is the first suggestion 58% of the time and in the top 3 87% of the time. The hard part is deciding 'new cat vs known cat': the balanced end-to-end score is about 0.61."
+  },
+  {
    "title": "Two detections in one photo are usually the same cat",
    "body": "Of 215 labeled same-photo detection pairs, 155 were the same cat: YOLO splits a cat at the collar or a hand, or fires twice (cat + dog class). The textbook rule 'detections in one photo are different individuals' would be wrong most of the time here. Merging detections whose masks overlap by more than 50% removes 148 duplicates (78% of them) and wrongly merges 8% of real pairs, mostly cats piled together. Within-visit grouping F1 jumped from 0.74 to 0.83."
   },
   {
-   "title": "End-to-end: 59% of crops get the right answer",
-   "body": "The realistic test replays visits in date order. Each visit's crops are clustered, each cluster is matched to cats confirmed on earlier visits or called a new cat, and the visit is then added to the roster as if you confirmed it. With DINOv2-B and the recipe, 59% of crops get the right cat or a correct 'new cat'. For cats already on the roster, the best match is right about half the time, and the new-cat threshold costs the rest. That is why the tool should suggest a top-3 and let a person confirm."
+   "title": "Masking out the background hurts",
+   "body": "Greying out everything outside the cat's segmentation mask was meant to stop the model matching laps and couches. On DINOv2-B it loses about 3 to 6 points of top-1 and known-cat top-3 versus the plain crop. The mask cuts off the collar and softens the silhouette, and DINOv2 already ignores most background. Plain crops are the default now."
+  },
+  {
+   "title": "Scoring end-to-end, and why it is balanced",
+   "body": "The realistic test replays visits in date order: cluster each visit's crops, match each cluster to cats confirmed on earlier visits or call it new, then add the visit to the roster as if you confirmed it. About 45% of crops are a cat's first appearance, so plain accuracy rewards a model that says 'new' a lot (a weak model topped that table). The headline is now balanced: the average of 'known cat named right' and 'new cat called new'."
   },
   {
    "title": "Collar colour is the single best cheap feature",
    "body": "Segmentation masks stop at the collar, so the colour is read from a 10px ring around the mask. Pink collars are pale (saturation 0.25 to 0.55) and blue jeans are everywhere, so each colour has its own rule. When it fires it is almost never wrong; it fires on roughly a third of crops. Adding it as a soft bonus or penalty lifts cross-visit top-1 from 0.41 to 0.46 on DINOv2-B."
+  },
+  {
+   "title": "The model is a good label auditor",
+   "body": "Within one visit the model is reliable, so a crop whose closest same-visit neighbour has a different label is worth a second look. In the first 24 such pairs, 4 were my labeling mistakes (for example, the orange-and-white cat on the Aug 6 couch is the yellow-collar cat). Those are fixed in labels v2. The rest are queued for you in the Review tab."
   },
   {
    "title": "Caf\u00e9-specific priors that help: recency and coat pattern",
@@ -58,10 +70,6 @@
   {
    "title": "Same visit is easy, a new visit is hard",
    "body": "Grouping crops of one visit by cat reaches B-cubed F1 0.83. Recognising a cat on a different visit gives top-1 around 0.4, and the right cat is in the top 3 about 70% of the time at the set level. Kittens change fast (eye colour, size, colourpoint darkening), so the gallery has to keep updating."
-  },
-  {
-   "title": "Generic tricks barely help",
-   "body": "PCA whitening and k-reciprocal re-ranking do not help, and h-flip TTA is neutral. Pooling burst shots (photos seconds apart with one cat) gives about +1 point."
   }
  ],
  "next": [

@@ -97,21 +97,24 @@ def pipeline_sim(S, y, sess, files, cluster_thr, taus=np.linspace(0.0, 1.2, 61),
         gal = sess < v; known = set(y[gal])
         for c in np.unique(cl):
             m = idx[cl == c]
-            best, bs = None, -9
+            best, bs, allsc = None, -9, {}
             for g in known:
                 G = S[np.ix_(m, np.nonzero(gal & (y == g))[0])]
                 kk = min(k, G.shape[1]); s_ = np.sort(G, axis=1)[:, -kk:].mean()
                 if rec_w and days is not None:  # recency prior: cats come and go (adopted cats stop appearing)
                     s_ += rec_w * np.exp(-(days[idx[0]] - days[gal & (y == g)].max()) / rec_tau)
+                allsc[g] = s_
                 if s_ > bs: best, bs = g, s_
-            for i in m: recs.append((y[i], best, bs, y[i] not in known))
+            top3 = sorted(allsc, key=lambda g: -allsc[g])[:3]
+            for i in m: recs.append((y[i], best, bs, y[i] not in known, y[i] in top3))
     out = None
     for t in taus:
-        ok = [(p == yt and s >= t) if not new else (s < t) for yt, p, s, new in recs]
-        acc = float(np.mean(ok))
-        if out is None or acc > out['sim_acc']:
-            kn = [o for o, r in zip(ok, recs) if not r[3]]; nw = [o for o, r in zip(ok, recs) if r[3]]
-            out = {'sim_acc': acc, 'sim_tau': float(t), 'sim_known_acc': float(np.mean(kn)), 'sim_new_acc': float(np.mean(nw)) if nw else float('nan'),
-                   'sim_n_known': len(kn), 'sim_n_new': len(nw)}
-    out['sim_closed_known_acc'] = float(np.mean([p == yt for yt, p, s, new in recs if not new]))
+        ok = [(p == yt and s >= t) if not new else (s < t) for yt, p, s, new, _ in recs]
+        kn = [o for o, r in zip(ok, recs) if not r[3]]; nw = [o for o, r in zip(ok, recs) if r[3]]
+        bal = (np.mean(kn) + np.mean(nw)) / 2  # balanced: ~45% of crops are a cat's first appearance
+        if out is None or bal > out['sim_bal']:
+            out = {'sim_bal': float(bal), 'sim_acc': float(np.mean(ok)), 'sim_tau': float(t), 'sim_known_acc': float(np.mean(kn)),
+                   'sim_new_acc': float(np.mean(nw)) if nw else float('nan'), 'sim_n_known': len(kn), 'sim_n_new': len(nw)}
+    out['sim_closed_known_acc'] = float(np.mean([p == yt for yt, p, s, new, _ in recs if not new]))
+    out['sim_known_top3'] = float(np.mean([t3 for yt, p, s, new, t3 in recs if not new]))
     return out

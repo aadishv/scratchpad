@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common, evaluate as ev, heuristics as H
 
 WORK = os.environ.get('WORK', '/home/user/data/work')
-LAB = os.environ.get('LABELS', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'labels/labels_v1.json'))
+LAB = os.environ.get('LABELS', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'labels/labels_v2.json'))
 dets, times, sess = common.load(WORK)
 files = [d['file'] for d in dets]
 lab = json.load(open(LAB)); raw = np.array([lab[d['id']] for d in dets])
@@ -72,7 +72,7 @@ def score(S, name, out, do_cluster=True):
     log_result(r)
     print(f"{name:55s} top1 {r['loose_top1']:.3f} mAP {r['loose_mAP']:.3f} | strict top1 {r['strict_top1']:.3f} | "
           f"open acc {r['open_acc']:.3f} (known {r['open_known_acc']:.3f} new {r['open_new_recall']:.3f}) | "
-          f"wv F1 {r.get('wv_bF1', float('nan')):.3f} | set top1 {r['set_top1']:.3f} top3 {r['set_top3']:.3f} | SIM {r.get('sim_acc', float('nan')):.3f} (known {r.get('sim_known_acc', float('nan')):.3f} new {r.get('sim_new_acc', float('nan')):.3f} closed {r.get('sim_closed_known_acc', float('nan')):.3f}) | +recency {r.get('simR_acc', float('nan')):.3f}", flush=True)
+          f"wv F1 {r.get('wv_bF1', float('nan')):.3f} | set top1 {r['set_top1']:.3f} top3 {r['set_top3']:.3f} | SIM {r.get('sim_acc', float('nan')):.3f} (known {r.get('sim_known_acc', float('nan')):.3f} new {r.get('sim_new_acc', float('nan')):.3f} closed {r.get('sim_closed_known_acc', float('nan')):.3f}) | E2E bal {r.get('simR_bal', float('nan')):.3f} known-top3 {r.get('simR_known_top3', float('nan')):.3f}", flush=True)
     return r
 
 if __name__ == '__main__':

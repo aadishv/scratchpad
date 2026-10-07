@@ -188,6 +188,9 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <h2>Same cat?</h2>
     <p class="sub" style="margin:0 0 14px;max-width:72ch">Left: crops from visits where I'm confident about this cat. Right: a visit where I only think it's the same cat. Kittens change a lot, so these links are the weakest part of the labels.</p>
     <div id="links"></div>
+    <h2 style="margin-top:28px">The model disagrees with my labels</h2>
+    <p class="sub" style="margin:0 0 14px;max-width:72ch">Pairs from the same visit that the model finds very similar but I labeled as different cats. Within one visit the model is right about 86% of the time, so some of these are my mistakes (the first batch already caught four).</p>
+    <div id="suspects"></div>
     <h2 style="margin-top:28px">Name the cats I couldn't</h2>
     <p class="sub" style="margin:0 0 14px;max-width:72ch">Crops I marked unidentifiable, by visit. Click one to give it a name if you know the cat.</p>
     <div id="unknowns"></div>
@@ -205,7 +208,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <div class="metric-help">
       <div><b>Cross-visit top-1</b>: for each labeled crop, is the most similar crop from a different visit the same cat? Same-visit matches are excluded, since burst shots make them trivial.</div>
       <div><b>Set top-1 / top-3</b>: all crops of one cat from one visit, matched as a group against other visits. Top-3 is the "is it one of these three?" prompt.</div>
-      <div><b>End-to-end acc</b>: replay visits in date order. Cluster each visit's crops, match each cluster to cats confirmed on earlier visits (with a recency prior), or call it a new cat. A crop is right if it gets its true cat, or "new" when that cat was never seen before. <b>Known cat right</b> is the same, counting only cats seen before and ignoring the new-cat threshold.</div>
+      <div><b>End-to-end (balanced)</b>: replay visits in date order. Cluster each visit's crops, match each cluster to cats confirmed on earlier visits (with a recency prior), or call it a new cat. Score = average of "known cat gets the right name" and "first-time cat is called new", since about 45% of crops are a cat's first appearance. <b>Known cat top-1 / top-3</b>: is the right cat the first suggestion, or among the first three, ignoring the new-cat threshold.</div>
       <div><b>Within-visit F1</b>: B-cubed F1 of clustering one visit's crops by cat (best threshold).</div>
       <div><b>Open-set</b>: replaying visits in order, does a query get the right known cat, or "new cat" if it has never been seen?</div>
     </div>
@@ -242,7 +245,7 @@ const vById = Object.fromEntries(visits.map(v => [v.v, v]));
 $('#updated').textContent = 'Updated ' + DATA.updated;
 
 // ---------- feedback state (db) ----------
-const FB = { crop: {}, group: {}, notes: [] };
+const FB = { crop: {}, group: {}, pair: {}, notes: [] };
 let db = null, canWrite = true;
 const rerenders = new Set();
 function refresh() { for (const f of rerenders) f(); }
@@ -285,9 +288,9 @@ const cats = [...new Set(labeled.map(c => base(c.lab)))];
 const kp = [
   ['Detections', crops.length, `${new Set(crops.map(c => c.id.replace(/_\d+$/, ''))).size} photos, ${visits.length} visits`],
   ['Cats labeled', cats.length, `${labeled.length} crops named; ${crops.filter(c => c.lab === '?').length} unidentifiable`],
-  ['Best end-to-end accuracy', best('simR_acc') ? best('simR_acc').simR_acc.toFixed(2) : '–', best('simR_acc')?.name || ''],
+  ['Best end-to-end (balanced)', best('simR_bal') ? best('simR_bal').simR_bal.toFixed(2) : '–', best('simR_bal')?.name || ''],
+  ['Best known-cat top-3', best('simR_known_top3') ? best('simR_known_top3').simR_known_top3.toFixed(2) : '–', best('simR_known_top3')?.name || ''],
   ['Best cross-visit top-1', best('loose_top1') ? best('loose_top1').loose_top1.toFixed(2) : '–', best('loose_top1')?.name || ''],
-  ['Best set top-3', best('set_top3') ? best('set_top3').set_top3.toFixed(2) : '–', best('set_top3')?.name || ''],
   ['Best within-visit F1', best('wv_bF1') ? best('wv_bF1').wv_bF1.toFixed(2) : '–', best('wv_bF1')?.name || ''],
 ];
 for (const [k, v, s] of kp) $('#kpis').append(el('div', { class: 'kpi' }, el('span', { class: 'label', text: k }), el('b', { text: String(v) }), el('small', { text: s })));
@@ -366,6 +369,29 @@ function renderLinks() {
 }
 renderLinks(); rerenders.add(renderLinks);
 
+const byId = Object.fromEntries(crops.map(c => [c.id, c]));
+function renderSuspects() {
+  const box = $('#suspects'); box.replaceChildren();
+  for (const p of (DATA.suspects || [])) {
+    const a = byId[p.a], b = byId[p.b]; if (!a || !b) continue;
+    const k = p.a + '__' + p.b; const ans = FB.pair[k]?.same;
+    const ask = el('div', { class: 'ask' }, el('span', { text: `${vById[p.v].date}: I said ${base(p.la)} vs ${base(p.lb)}.` }));
+    for (const [val, txt] of [['yes', 'Same cat'], ['no', 'Different cats'], ['unsure', "Can't tell"]]) {
+      const btn = el('button', { class: 'btn' + (ans === val ? ' sel-' + val : ''), text: txt });
+      if (!canWrite) btn.disabled = true;
+      btn.addEventListener('click', () => savePair(k, val, p)); ask.append(btn);
+    }
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'crops' }, sprite(a, 128), sprite(b, 128)), ask));
+  }
+}
+async function savePair(k, val, p) {
+  FB.pair[k] = { same: val }; refresh();
+  if (!db) return;
+  try { await db.collection('pair_fb').doc(k).set({ same: val, la: p.la, lb: p.lb, at: new Date().toISOString() }); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
+renderSuspects(); rerenders.add(renderSuspects);
+
 function renderUnknowns() {
   const box = $('#unknowns'); box.replaceChildren();
   for (const v of visits) {
@@ -427,12 +453,13 @@ function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-not
   if (w === false) setReadOnly();
   db.collection('crop_fb').onSnapshot(s => { FB.crop = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('group_fb').onSnapshot(s => { FB.group = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
+  db.collection('pair_fb').onSnapshot(s => { FB.pair = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('notes').orderBy('at', 'desc').limit(100).onSnapshot(s => { FB.notes = s.docs.map(d => d.data()); renderNotes(); }, () => {});
 })();
 
 // ---------- experiments ----------
-const COLS = [['name', 'Variant'], ['simR_acc', 'End-to-end acc'], ['simR_closed_known_acc', 'E2E: known cat right'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];
-let sortCol = 'simR_acc';
+const COLS = [['name', 'Variant'], ['simR_bal', 'End-to-end (balanced)'], ['simR_closed_known_acc', 'Known cat: top-1'], ['simR_known_top3', 'Known cat: top-3'], ['simR_new_acc', 'New cat caught'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];
+let sortCol = 'simR_bal';
 function renderRes() {
   const t = $('#res'); t.replaceChildren();
   const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes(); } })); t.append(hr);

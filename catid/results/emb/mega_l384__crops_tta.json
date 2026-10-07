@@ -1,0 +1,1 @@
+{"model": "mega_l384", "variant": "crops", "tta": true, "n": 975, "sec": 2013.3834569454193, "ms_per_crop": 2065.008673790174, "dim": 1536}

@@ -109,6 +109,9 @@ table.presence tr:hover td { background: var(--chip) }
 .btn.sel-unsure { background: var(--warn); border-color: var(--warn); color: #fff }
 .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink) }
 .saved { font: 12px var(--mono); color: var(--good) }
+.claude { margin-top: 10px; font-size: 14px; color: var(--muted); max-width: 72ch; white-space: pre-wrap }
+.claude b { color: var(--ink) }
+.btn.ghost { border-style: dashed }
 .ro-note { background: var(--chip); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; color: var(--muted); margin-bottom: 14px }
 textarea, input.txt { font: 14px var(--body); width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink) }
 textarea { min-height: 90px; resize: vertical }
@@ -348,6 +351,46 @@ renderCats(); rerenders.add(renderCats);
 const groups = {};
 for (const c of labeled) { const k = base(c.lab) + '__v' + c.v; (groups[k] ||= { cat: base(c.lab), v: c.v, cs: [] }).cs.push(c); }
 const unsureGroups = Object.entries(groups).filter(([k, g]) => g.cs.every(c => c.lab.endsWith('~'))).sort((a, b) => a[1].v - b[1].v);
+// ---------- ask Claude (vision second opinion, on the viewer's own Claude usage) ----------
+let sample = null;
+const askState = {};  // key -> {status, text}
+const atlasImgs = {};
+function atlasImg(a) { return atlasImgs[a] ||= new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = `atlas${a}.jpg`; }); }
+async function cropBlob(c) {
+  const per = DATA.per, cell = DATA.cell, a = Math.floor(c.i / (per * per)), j = c.i % (per * per);
+  const im = await atlasImg(a); const cv = document.createElement('canvas'); cv.width = cv.height = cell;
+  cv.getContext('2d').drawImage(im, (j % per) * cell, Math.floor(j / per) * cell, cell, cell, 0, 0, cell, cell);
+  return new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+}
+async function askClaude(key, left, right, leftName, rightName) {
+  if (!sample) return;
+  askState[key] = { status: 'busy', text: 'Thinking...' }; refresh();
+  try {
+    const images = await Promise.all([...left, ...right].map(cropBlob));
+    const prompt = `You are helping identify individual cats at a cat cafe from small phone-photo crops (128px, letterboxed; neighbouring cats may appear at the edges). ` +
+      `Images 1-${left.length} are crops of one cat (${leftName}). Images ${left.length + 1}-${left.length + right.length} are crops labelled ${rightName}. ` +
+      `Kittens grow over the months; collars can change but usually do not. Compare coat colour and pattern, white markings, face, eye colour, collar colour and any name written on it. ` +
+      `Are the two groups the same individual cat? Reply as JSON: {"verdict": "same" | "different" | "unsure", "confidence": 0-1, "reason": "one or two sentences naming the decisive features"}`;
+    const r = await sample.json(prompt, { images, modelTier: 'default' });
+    askState[key] = { status: 'done', r };
+    try { await db?.collection('claude_fb').doc(key).set({ verdict: String(r.verdict), confidence: Number(r.confidence) || 0, reason: String(r.reason || ''), at: new Date().toISOString() }); } catch (e) {}
+  } catch (e) {
+    const msg = { not_granted: 'Claude was not allowed for this page.', rate_limited: 'Too many requests right now. Try again in a minute.', images_unavailable: "This view can't send images to Claude." }[e?.code] || "Claude couldn't answer this time.";
+    askState[key] = { status: 'error', text: msg };
+  }
+  refresh();
+}
+function claudeBox(key, left, right, ln, rn) {
+  const st = askState[key];
+  const wrap = el('div');
+  if (sample && (!st || st.status === 'error')) wrap.append(el('button', { class: 'btn ghost', text: 'Ask Claude', onclick: () => askClaude(key, left, right, ln, rn) }));
+  if (st) {
+    if (st.status === 'done') wrap.append(el('div', { class: 'claude' }, el('b', { text: `Claude: ${st.r.verdict}` }), ` (confidence ${Math.round(100 * (Number(st.r.confidence) || 0))}%). ${st.r.reason || ''}`));
+    else wrap.append(el('div', { class: 'claude', text: st.text }));
+  }
+  return wrap;
+}
+
 function renderLinks() {
   const box = $('#links'); box.replaceChildren();
   let open = 0;
@@ -363,7 +406,8 @@ function renderLinks() {
       b.addEventListener('click', () => saveGroup(k, val));
       ask.append(b);
     }
-    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'pair' }, left, right), ask));
+    const L = anchor.slice(0, 4), Rr = g.cs.filter(c => c.p).slice(0, 4);
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'pair' }, left, right), ask, L.length ? claudeBox('g_' + k, L, Rr, g.cat + ' (confident visits)', `possibly ${g.cat} (${vById[g.v].date})`) : null));
   }
   $('#qcount').textContent = open ? `(${open})` : '';
 }
@@ -381,7 +425,7 @@ function renderSuspects() {
       if (!canWrite) btn.disabled = true;
       btn.addEventListener('click', () => savePair(k, val, p)); ask.append(btn);
     }
-    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'crops' }, sprite(a, 128), sprite(b, 128)), ask));
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'crops' }, sprite(a, 128), sprite(b, 128)), ask, claudeBox('p_' + k, [a], [b], base(p.la), base(p.lb))));
   }
 }
 async function savePair(k, val, p) {
@@ -446,6 +490,7 @@ rerenders.add(renderNotes);
 function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-note').disabled = true; refresh(); }
 
 (async () => {
+  window.claude?.use?.('sample').then(sm => { sample = sm; refresh(); });
   db = await window.claude?.use?.('db') ?? null;
   const user = await window.claude?.use?.('user') ?? null;
   if (!db) { setReadOnly(); return; }

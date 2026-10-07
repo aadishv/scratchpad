@@ -1,0 +1,51 @@
+{
+ "args": {
+  "work": "/home/user/data/work",
+  "tag": "ftA_s224_u4_arcface",
+  "arch": "dinov2_s",
+  "size": 224,
+  "unfreeze": 4,
+  "steps": 400,
+  "lr": 5e-05,
+  "P": 8,
+  "K": 4,
+  "folds": 5,
+  "loss": "arcface",
+  "threads": 4,
+  "labels": null,
+  "max_folds": 99
+ },
+ "folds": [
+  {
+   "fold": 0,
+   "train_crops": 310,
+   "cats": 34,
+   "sec": 946.9142224788666
+  },
+  {
+   "fold": 1,
+   "train_crops": 343,
+   "cats": 35,
+   "sec": 1872.3484003543854
+  },
+  {
+   "fold": 2,
+   "train_crops": 273,
+   "cats": 33,
+   "sec": 2831.879816055298
+  },
+  {
+   "fold": 3,
+   "train_crops": 322,
+   "cats": 33,
+   "sec": 3824.4736166000366
+  },
+  {
+   "fold": 4,
+   "train_crops": 332,
+   "cats": 29,
+   "sec": 4861.355223417282
+  }
+ ],
+ "sec": 4861.356597185135
+}

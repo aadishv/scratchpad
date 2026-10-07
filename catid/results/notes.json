@@ -13,7 +13,7 @@
   {
    "stage": "Hand labels",
    "state": "done",
-   "detail": "Labels v2: 652 crops across 54 cats after fixing 4 mistakes the model found. 321 unidentifiable. Needs your review."
+   "detail": "Labels v3 after your review: 525 crops across 53 cats; rejected links dropped. Name any cat you know in the Roster tab."
   },
   {
    "stage": "Embeddings",
@@ -33,8 +33,16 @@
  ],
  "findings": [
   {
-   "title": "Current best: the right cat is in the top 3 suggestions 87% of the time",
-   "body": "Recipe: DINOv2-B on the plain crop (no background masking), centered, burst shots pooled, plus collar colour and a zero-shot coat-pattern gate. For a cluster of today's photos of a cat that has been seen before, the right name is the first suggestion 58% of the time and in the top 3 87% of the time. The hard part is deciding 'new cat vs known cat': the balanced end-to-end score is about 0.61."
+   "title": "Your review: 33 of my 73 uncertain links were right",
+   "body": "You confirmed 33 cross-visit links and rejected 40, so my guesses about which kitten grew into which cat were barely better than a coin flip. The rejected ones are dropped for now, as you suggested. Of the 30 'model disagrees with my label' pairs, 3 were the same cat. With your names, BlackBlue and SmokeKit are Onyx, and OrangeYellow is Shovel. Labels v3: 525 crops across 53 cats, 4 uncertain links left. On these cleaner labels, for a cat seen before, the right one is in the top 3 suggestions 94 to 96% of the time (87% on my labels), and top-1 is 0.53."
+  },
+  {
+   "title": "Collar code: blue = male, pink = female, yellow = adopted",
+   "body": "Your rule became a compatibility score: same colour gets a bonus. Pink vs blue is impossible. Yellow after pink or blue is allowed (an adoption), and yellow before pink or blue is impossible, as are two colours in one visit. Checking my labels against it exposed collar-detector noise rather than label errors: red pants read as pink, a blue towel and jeans as blue, and neighbours' collars in cat piles. The detector now ignores other cats' pixels and rejects colours that also fill the surrounding background. Pink and red count as one family, and blue must be bright. Its agreement with each cat's usual colour went from 90% to 97%. Scoring-wise the code matches the simple same/different collar score, since few pink-to-yellow transitions are labeled, but it encodes an impossible match (pink vs blue) that pure similarity can't."
+  },
+  {
+   "title": "Current best recipe",
+   "body": "DINOv2 (B or S) on the plain crop, centered, burst shots pooled, plus the collar code and a zero-shot coat-pattern gate. On labels v3: cross-visit top-1 about 0.53, and known-cat top-3 0.94 (B) to 0.96 (S). The hard part remains 'new cat or known cat': balanced end-to-end about 0.65."
   },
   {
    "title": "Patterned cats are easy, black cats and tabbies are hard",

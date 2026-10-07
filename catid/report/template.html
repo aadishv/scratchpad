@@ -172,7 +172,8 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <div class="toolbar">
       <input type="search" id="q" placeholder="Filter cats by name, e.g. tux, orange, Jade" aria-label="Filter cats">
       <div class="seg" role="group" aria-label="Sort">
-        <button data-sort="count" aria-pressed="true">Most photos</button>
+        <button data-sort="last" aria-pressed="true">Last seen</button>
+        <button data-sort="count" aria-pressed="false">Most photos</button>
         <button data-sort="first" aria-pressed="false">First seen</button>
         <button data-sort="name" aria-pressed="false">Name</button>
       </div>
@@ -181,7 +182,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
       <span><i class="sw"></i> confident</span>
       <span><i class="sw u"></i> uncertain link to this cat</span>
       <span><i class="sw d"></i> duplicate detection</span>
-      <span>Click any crop to mark it right or wrong.</span>
+      <span>Type a real name next to any cat you know (it saves when you leave the field). Click a crop to mark it right or wrong.</span>
     </div>
     <div class="cats" id="cats"></div>
   </section>
@@ -194,9 +195,6 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <h2 style="margin-top:28px">The model disagrees with my labels</h2>
     <p class="sub" style="margin:0 0 14px;max-width:72ch">Pairs from the same visit that the model finds very similar but I labeled as different cats. Within one visit the model is right about 86% of the time, so some of these are my mistakes (the first batch already caught four).</p>
     <div id="suspects"></div>
-    <h2 style="margin-top:28px">Name the cats I couldn't</h2>
-    <p class="sub" style="margin:0 0 14px;max-width:72ch">Crops I marked unidentifiable, by visit. Click one to give it a name if you know the cat.</p>
-    <div id="unknowns"></div>
     <h2 style="margin-top:28px">Notes for Claude</h2>
     <div class="panel">
       <label class="label" for="note">Anything: real cat names, which cats are siblings, ideas, what you want next</label>
@@ -252,7 +250,9 @@ const vById = Object.fromEntries(visits.map(v => [v.v, v]));
 $('#updated').textContent = 'Updated ' + DATA.updated;
 
 // ---------- feedback state (db) ----------
-const FB = { crop: {}, group: {}, pair: {}, notes: [] };
+const FB = { crop: {}, group: {}, pair: {}, names: {}, notes: [] };
+const KNOWN_NAMES = DATA.names || {};
+const disp = n => FB.names[n]?.name || KNOWN_NAMES[n] || n;
 let db = null, canWrite = true;
 const rerenders = new Set();
 function refresh() { for (const f of rerenders) f(); }
@@ -312,7 +312,7 @@ const firstSeen = n => Math.min(...byCat[n].map(c => c.v));
   for (const v of visits) hr.append(el('th', { class: 'vh', title: `${v.dow} ${v.iso}: ${v.photos} photos`, text: v.date }));
   t.append(hr);
   for (const n of [...cats].sort((a, b) => firstSeen(a) - firstSeen(b) || byCat[b].length - byCat[a].length)) {
-    const tr = el('tr', {}, el('td', { class: 'name', text: n, onclick: () => { show('roster'); $('#q').value = n; renderCats(); } }));
+    const tr = el('tr', {}, el('td', { class: 'name', text: KNOWN_NAMES[n] || n, onclick: () => { show('roster'); $('#q').value = n; renderCats(); } }));
     for (const v of visits) {
       const cs = byCat[n].filter(c => c.v === v.v); const td = el('td');
       if (cs.length) { const d = Math.min(16, 6 + 2 * Math.sqrt(cs.length)); const dot = el('span', { class: 'dot' + (cs.every(c => c.lab.endsWith('~')) ? ' unsure' : ''), title: `${n}: ${cs.length} crops on ${v.date}` }); dot.style.width = dot.style.height = d + 'px'; td.append(dot); }
@@ -323,21 +323,27 @@ const firstSeen = n => Math.min(...byCat[n].map(c => c.v));
 }
 
 // ---------- roster ----------
-let sortBy = 'count';
+let sortBy = 'last';
+const lastSeen = n => Math.max(...byCat[n].map(c => c.v));
 const expanded = new Set();
 document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { sortBy = b.dataset.sort; document.querySelectorAll('[data-sort]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderCats(); }));
 $('#q').addEventListener('input', () => renderCats());
 for (const n of cats.sort()) $('#catnames').append(el('option', { value: n }));
 function renderCats() {
   const q = $('#q').value.trim().toLowerCase();
-  let names = cats.filter(n => !q || n.toLowerCase().includes(q));
-  names.sort(sortBy === 'count' ? (a, b) => byCat[b].length - byCat[a].length : sortBy === 'first' ? (a, b) => firstSeen(a) - firstSeen(b) : (a, b) => a.localeCompare(b));
+  let names = cats.filter(n => !q || n.toLowerCase().includes(q) || disp(n).toLowerCase().includes(q));
+  names.sort(sortBy === 'last' ? (a, b) => lastSeen(b) - lastSeen(a) || byCat[b].length - byCat[a].length : sortBy === 'count' ? (a, b) => byCat[b].length - byCat[a].length : sortBy === 'first' ? (a, b) => firstSeen(a) - firstSeen(b) : (a, b) => a.localeCompare(b));
   const box = $('#cats'); box.replaceChildren();
   for (const n of names) {
     const cs = byCat[n]; const vs = [...new Set(cs.map(c => c.v))];
     const cols = {}; cs.forEach(c => { if (c.col) cols[c.col] = (cols[c.col] || 0) + 1; });
     const colTxt = Object.entries(cols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ×${v}`).join(', ');
-    const head = el('div', { class: 'cat-head' }, el('h3', { text: n }), el('span', { class: 'meta', text: `${cs.length} crops · ${vs.length} visits` + (colTxt ? ` · collar seen: ${colTxt}` : '') }));
+    const nm = el('input', { class: 'txt', id: 'name-' + n, placeholder: 'Real name?', 'aria-label': `Real name for ${n}`, style: 'width:150px;padding:5px 8px' });
+    nm.value = FB.names[n]?.name || '';
+    if (!canWrite) nm.disabled = true;
+    nm.addEventListener('change', () => { const v = nm.value.trim(); if (v !== (FB.names[n]?.name || '')) saveName(n, v); });
+    const head = el('div', { class: 'cat-head' }, el('h3', { text: disp(n) }), disp(n) !== n ? el('span', { class: 'meta', text: `(${n})` }) : null,
+      el('span', { class: 'meta', text: `${cs.length} crops · ${vs.length} visits · last seen ${vById[Math.max(...vs)].date}` + (colTxt ? ` · collar: ${colTxt}` : '') }), nm);
     const strip = el('div', { class: 'vstrip' });
     for (const v of visits) { const here = cs.filter(c => c.v === v.v); if (!here.length) continue; strip.append(el('span', { class: here.every(c => c.lab.endsWith('~')) ? 'unsure' : 'on', text: v.date })); }
     const card = el('div', { class: 'cat' }, head, strip);
@@ -349,7 +355,7 @@ function renderCats() {
     box.append(card);
   }
 }
-renderCats(); rerenders.add(renderCats);
+renderCats(); rerenders.add(() => { if (!document.activeElement?.id?.startsWith('name-')) renderCats(); });
 
 // ---------- review: uncertain links ----------
 const groups = {};
@@ -448,7 +454,7 @@ function renderUnknowns() {
     box.append(el('div', { class: 'vgroup' }, el('span', { class: 'label', text: `${v.dow} ${v.date} · ${cs.length}` }), el('div', { class: 'crops' }, ...cs.map(c => sprite(c, 64)))));
   }
 }
-renderUnknowns(); rerenders.add(renderUnknowns);
+
 
 // ---------- crop dialog ----------
 let cur = null;
@@ -478,6 +484,12 @@ async function saveCrop(c, body) {
   try { await db.collection('crop_fb').doc(c.id).set({ ...body, label: c.lab, at: new Date().toISOString() }); }
   catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
 }
+async function saveName(cat, name) {
+  FB.names[cat] = { name }; refresh();
+  if (!db) return;
+  try { await db.collection('cat_fb').doc(cat).set({ name, at: new Date().toISOString() }); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
 async function saveGroup(k, val) {
   FB.group[k] = { same: val }; refresh();
   if (!db) return;
@@ -502,6 +514,7 @@ function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-not
   if (w === false) setReadOnly();
   db.collection('crop_fb').onSnapshot(s => { FB.crop = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('group_fb').onSnapshot(s => { FB.group = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
+  db.collection('cat_fb').onSnapshot(s => { FB.names = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('pair_fb').onSnapshot(s => { FB.pair = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('notes').orderBy('at', 'desc').limit(100).onSnapshot(s => { FB.notes = s.docs.map(d => d.data()); renderNotes(); }, () => {});
 })();

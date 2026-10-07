@@ -11,7 +11,7 @@ os.makedirs(out, exist_ok=True)
 CELL, PER = 128, 16  # 16x16 cells per atlas
 
 dets, times, sess = common.load(work)
-lab = json.load(open(os.path.join(ROOT, 'labels/labels_v2.json')))
+lab = json.load(open(os.path.join(ROOT, 'labels/labels_v3.json')))
 primary = np.load(f'{work}/primary.npy')
 collar = np.load(f'{work}/collar.npy')
 from collar import NAMES as CNAMES
@@ -47,7 +47,8 @@ for f in ('detector_bench.json', 'notes.json', 'suspects.json', 'by_coat.json', 
 emb_meta = {}
 for p in sorted(os.listdir(f'{work}/emb')):
     if p.endswith('.json'): emb_meta[p[:-5]] = json.load(open(f'{work}/emb/{p}'))
-data = {'updated': dt.datetime.now(dt.timezone(dt.timedelta(hours=-7))).strftime('%b %-d, %-I:%M %p PT'),
+names = {'Onyx': 'Onyx', 'Shovel': 'Shovel', 'Jade': 'Jade', 'Rocky': 'Rocky'}
+data = {'names': names, 'updated': dt.datetime.now(dt.timezone(dt.timedelta(hours=-7))).strftime('%b %-d, %-I:%M %p PT'),
         'visits': visits, 'crops': crops, 'cell': CELL, 'per': PER, 'n_atlas': n_atlas,
         'results': log, 'emb': emb_meta, **extra}
 tpl = open(os.path.join(HERE, 'template.html')).read()

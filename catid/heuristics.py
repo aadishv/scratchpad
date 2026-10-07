@@ -69,3 +69,25 @@ def same_photo_mask(files):
 def coat_sim(P):
     """Bhattacharyya overlap of zero-shot coat-pattern distributions, in [0, 1]."""
     R = np.sqrt(P); return R @ R.T
+
+# Café collar code (from the user): blue = male, pink = female, yellow = adopted.
+# A cat can go blue->yellow or pink->yellow over time, never any other direction.
+COLLAR_SEX = {'pink': 'F', 'blue': 'M'}
+def collar_compat(C, times, sess, floor=0.004, names=('pink', 'red', 'yellowgreen', 'blue', 'purple'),
+                  same=1.0, impossible=-3.0, adopt=0.3, other_diff=-1.0):
+    """Pairwise collar compatibility using the collar code. 0 where either collar is not visible.
+    same colour: +same; pink vs blue: impossible; yellow-after-pink/blue (later visit): +adopt (allowed);
+    yellow-before-pink/blue or a different colour within one visit: impossible; any other mismatch: other_diff."""
+    has = C.max(1) > floor; col = np.array([names[k] for k in C.argmax(1)])
+    N = len(C); M = np.zeros((N, N), np.float32)
+    for i in np.nonzero(has)[0]:
+        for j in np.nonzero(has)[0]:
+            a, b = col[i], col[j]
+            if a == b: M[i, j] = same
+            elif sess[i] == sess[j]: M[i, j] = impossible
+            elif {a, b} == {'pink', 'blue'}: M[i, j] = impossible
+            elif 'yellowgreen' in (a, b) and ({a, b} & {'pink', 'blue'}):
+                y, o = (i, j) if a == 'yellowgreen' else (j, i)
+                M[i, j] = adopt if times[y] > times[o] else impossible
+            else: M[i, j] = other_diff
+    return M

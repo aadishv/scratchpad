@@ -1,0 +1,1 @@
+ftB_s224_u2_gentle | recipe                             top1 0.554 mAP 0.460 | strict top1 0.552 | open acc 0.574 (known 0.498 new 0.683) | wv F1 0.867 | set top1 0.610 top3 0.841 | SIM 0.563 (known 0.361 new 0.848 closed 0.519) | E2E bal 0.643 known-top3 0.914

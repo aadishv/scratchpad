@@ -1,0 +1,1 @@
+ftC_b224_u4_supcon | recipe                             top1 0.518 mAP 0.471 | strict top1 0.518 | open acc 0.572 (known 0.468 new 0.720) | wv F1 0.881 | set top1 0.537 top3 0.866 | SIM 0.585 (known 0.326 new 0.952 closed 0.558) | E2E bal 0.649 known-top3 0.897

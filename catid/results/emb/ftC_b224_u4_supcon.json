@@ -1,0 +1,51 @@
+{
+ "args": {
+  "work": "/home/user/data/work",
+  "tag": "ftC_b224_u4_supcon",
+  "arch": "dinov2_b",
+  "size": 224,
+  "unfreeze": 4,
+  "steps": 150,
+  "lr": 2e-05,
+  "P": 8,
+  "K": 4,
+  "folds": 5,
+  "loss": "supcon",
+  "threads": 4,
+  "labels": null,
+  "max_folds": 99
+ },
+ "folds": [
+  {
+   "fold": 0,
+   "train_crops": 310,
+   "cats": 34,
+   "sec": 1169.6212027072906
+  },
+  {
+   "fold": 1,
+   "train_crops": 343,
+   "cats": 35,
+   "sec": 2387.8836603164673
+  },
+  {
+   "fold": 2,
+   "train_crops": 273,
+   "cats": 33,
+   "sec": 3597.3254013061523
+  },
+  {
+   "fold": 3,
+   "train_crops": 322,
+   "cats": 33,
+   "sec": 4853.322041988373
+  },
+  {
+   "fold": 4,
+   "train_crops": 332,
+   "cats": 29,
+   "sec": 6069.620377063751
+  }
+ ],
+ "sec": 6069.622589111328
+}

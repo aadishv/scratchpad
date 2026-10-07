@@ -1,0 +1,458 @@
+<title>Cat Café Re-ID Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab notebook. Sticky tab bar; overview -> roster (one card per cat) -> review queue -> experiments.
+   Accents are the café's actual collar colours: pink, blue, lime. */
+:root {
+  --bg: #f3f4f6; --panel: #ffffff; --ink: #1d2230; --muted: #5d6475; --line: #dde0e7;
+  --pink: #d63d83; --blue: #2273c9; --lime: #6f9a12; --warn: #b8660b; --bad: #c23a3a; --good: #2e8a57;
+  --chip: #eceef3; --sprite-bg: #262830;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171c; --panel: #1d2027; --ink: #e8eaf0; --muted: #9aa1b2; --line: #2e323c;
+  --pink: #f06aa6; --blue: #5aa6f2; --lime: #a6cf45; --warn: #e3a050; --bad: #ef6b6b; --good: #5cc28a;
+  --chip: #272b34; --sprite-bg: #0f1013; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15171c; --panel: #1d2027; --ink: #e8eaf0; --muted: #9aa1b2; --line: #2e323c;
+  --pink: #f06aa6; --blue: #5aa6f2; --lime: #a6cf45; --warn: #e3a050; --bad: #ef6b6b; --good: #5cc28a;
+  --chip: #272b34; --sprite-bg: #0f1013; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 60px }
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; padding-block: 8px 4px }
+h1 { font: 700 clamp(28px, 4.4vw, 42px)/1.05 var(--display); letter-spacing: -0.02em; margin: 0; text-wrap: balance }
+h1 .period { color: var(--pink) }
+.sub { color: var(--muted); font-size: 14px }
+h2 { font: 700 22px/1.2 var(--display); margin: 0 0 12px; text-wrap: balance }
+h3 { font: 600 16px/1.3 var(--body); margin: 0 }
+.label { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 4px;
+  border-bottom: 1px solid var(--line); margin-block: 14px 22px; overflow-x: auto }
+nav.tabs button { font: 600 14px var(--body); color: var(--muted); background: none; border: 0; padding: 10px 14px; cursor: pointer;
+  border-bottom: 3px solid transparent; white-space: nowrap }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--pink) }
+nav.tabs button:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+section[hidden] { display: none }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr) } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px }
+.kpi b { display: block; font: 700 30px/1.1 var(--display); font-variant-numeric: tabular-nums; margin-top: 6px }
+.kpi small { color: var(--muted); font-size: 12.5px; display: block; margin-top: 4px }
+.status { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none }
+.status li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; align-items: start }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 500 12px var(--mono); padding: 3px 8px; border-radius: 99px; background: var(--chip) }
+.pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted) }
+.pill.done i { background: var(--good) } .pill.running i { background: var(--warn); animation: pulse 1.4s infinite }
+@keyframes pulse { 50% { opacity: .3 } }
+@media (prefers-reduced-motion: reduce) { .pill.running i { animation: none } }
+.status .stage { font-weight: 600 }
+.status .detail { color: var(--muted); font-size: 14px }
+.findings { display: grid; gap: 14px }
+.finding h3 { margin-bottom: 4px }
+.finding p { margin: 0; color: var(--muted); max-width: 68ch }
+ul.next { margin: 6px 0 0; padding-left: 18px; color: var(--muted) }
+/* presence chart */
+.presence-wrap { overflow-x: auto; margin-top: 8px }
+table.presence { border-collapse: collapse; font: 12px var(--mono) }
+table.presence th { font-weight: 500; color: var(--muted); padding: 2px 3px; white-space: nowrap }
+table.presence th.vh { writing-mode: vertical-rl; transform: rotate(180deg); height: 58px; text-align: left }
+table.presence td { width: 20px; height: 18px; text-align: center; padding: 0 }
+table.presence td.name { width: auto; text-align: right; padding-right: 8px; color: var(--ink); font-family: var(--body); white-space: nowrap; cursor: pointer }
+table.presence tr:hover td { background: var(--chip) }
+.dot { display: inline-block; border-radius: 50%; background: var(--blue); vertical-align: middle }
+.dot.unsure { background: transparent; border: 2px solid var(--warn) }
+/* roster */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px }
+.toolbar input[type=search] { font: 14px var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); min-width: 0; flex: 1 1 220px }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden }
+.seg button { font: 500 13px var(--body); background: var(--panel); color: var(--muted); border: 0; padding: 7px 11px; cursor: pointer }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg) }
+.cats { display: grid; gap: 16px }
+.cat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px }
+.cat-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; margin-bottom: 10px }
+.cat-head h3 { font: 700 19px var(--display) }
+.cat-head .meta { color: var(--muted); font-size: 13px }
+.cat-head .fbname { font: 13px var(--body); color: var(--pink) }
+.vstrip { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 10px }
+.vstrip span { font: 11px var(--mono); padding: 1px 5px; border-radius: 4px; background: var(--chip); color: var(--muted) }
+.vstrip span.on { background: var(--blue); color: #fff } .vstrip span.unsure { background: transparent; border: 1px dashed var(--warn); color: var(--warn) }
+.crops { display: flex; flex-wrap: wrap; gap: 4px }
+.sp { width: 76px; height: 76px; border-radius: 6px; background-color: var(--sprite-bg); background-repeat: no-repeat; position: relative; cursor: pointer; border: 2px solid transparent; flex: none; padding: 0 }
+.sp.unsure { border: 2px dashed var(--warn) }
+.sp.dup { opacity: .55 }
+.sp.flag::after { content: "✕"; position: absolute; top: 2px; right: 3px; font: 700 12px var(--body); color: #fff; background: var(--bad); border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center }
+.sp.ok::after { content: "✓"; position: absolute; top: 2px; right: 3px; font: 700 11px var(--body); color: #fff; background: var(--good); border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center }
+.sp.big { width: 128px; height: 128px }
+.more { font: 500 13px var(--body); color: var(--blue); background: none; border: 0; cursor: pointer; padding: 6px 0 0 }
+.vgroup { margin-top: 8px }
+.vgroup .label { margin-bottom: 4px; display: block }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 13px; margin-bottom: 12px }
+.legend span { display: inline-flex; gap: 6px; align-items: center }
+.legend .sw { width: 16px; height: 16px; border-radius: 4px; background: var(--sprite-bg) }
+.legend .sw.u { border: 2px dashed var(--warn) } .legend .sw.d { opacity: .55 }
+/* review */
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start }
+@media (max-width: 640px) { .pair { grid-template-columns: minmax(0, 1fr) } }
+.q { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px }
+.q.answered { opacity: .75 }
+.q .ask { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px }
+.btn { font: 600 13px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 7px 12px; border-radius: 8px; cursor: pointer }
+.btn:hover { border-color: var(--ink) }
+.btn.sel-yes { background: var(--good); border-color: var(--good); color: #fff }
+.btn.sel-no { background: var(--bad); border-color: var(--bad); color: #fff }
+.btn.sel-unsure { background: var(--warn); border-color: var(--warn); color: #fff }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink) }
+.saved { font: 12px var(--mono); color: var(--good) }
+.ro-note { background: var(--chip); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; color: var(--muted); margin-bottom: 14px }
+textarea, input.txt { font: 14px var(--body); width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink) }
+textarea { min-height: 90px; resize: vertical }
+.notes-list { display: grid; gap: 8px; margin-top: 12px }
+.notes-list div { background: var(--chip); border-radius: 8px; padding: 8px 10px; font-size: 14px; white-space: pre-wrap }
+.notes-list small { color: var(--muted); font: 11px var(--mono); display: block; margin-top: 3px }
+/* crop dialog */
+dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); padding: 18px; max-width: min(440px, calc(100vw - 32px)); width: 100% }
+dialog::backdrop { background: rgb(0 0 0 / .45) }
+dialog .row { display: flex; gap: 14px; align-items: flex-start }
+dialog dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; font-size: 13px }
+dialog dt { color: var(--muted) } dialog dd { margin: 0; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere }
+dialog .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px }
+/* experiments */
+.tbl-wrap { overflow-x: auto }
+table.res { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums }
+table.res th { text-align: left; font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; cursor: pointer }
+table.res td { padding: 7px 10px; border-bottom: 1px solid var(--line); white-space: nowrap }
+table.res td.n { font-family: var(--mono); font-size: 12.5px; white-space: normal; min-width: 260px }
+table.res tr.best td { background: color-mix(in srgb, var(--lime) 14%, transparent) }
+.bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--blue); vertical-align: middle; margin-right: 6px }
+.metric-help { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 20px; color: var(--muted); font-size: 13.5px; margin: 6px 0 18px }
+.metric-help b { color: var(--ink); font-weight: 600 }
+footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Cat Café Re-ID Lab<span class="period">.</span></h1>
+    <span class="sub" id="updated"></span>
+  </header>
+  <p class="sub" style="max-width:72ch;margin:6px 0 0">Which cat is in each photo? An experiment log for identifying individual shelter cats across 6 months of café visits with embedding models and café-specific heuristics. Review the roster and the open questions; your answers are saved here and I read them back to improve the labels and the pipeline.</p>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="roster" aria-selected="false">Roster</button>
+    <button role="tab" data-tab="review" aria-selected="false">Review queue <span id="qcount"></span></button>
+    <button role="tab" data-tab="experiments" aria-selected="false">Experiments</button>
+  </nav>
+
+  <section id="tab-overview">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="panel"><h2>Findings so far</h2><div class="findings" id="findings"></div></div>
+      <div style="display:grid;gap:22px;align-content:start;min-width:0">
+        <div class="panel"><h2>Pipeline status</h2><ul class="status" id="status"></ul></div>
+        <div class="panel"><h2>Up next</h2><ul class="next" id="next"></ul></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:22px">
+      <h2>Who was there, visit by visit</h2>
+      <p class="sub" style="margin:0 0 6px">Each row is a cat from my first-pass labels, each column a visit. Dot size is the number of crops. Hollow dots are visits where I linked the cat with low confidence. Click a name to open it in the roster.</p>
+      <div class="presence-wrap"><table class="presence" id="presence"></table></div>
+    </div>
+  </section>
+
+  <section id="tab-roster" hidden>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Filter cats by name, e.g. tux, orange, Jade" aria-label="Filter cats">
+      <div class="seg" role="group" aria-label="Sort">
+        <button data-sort="count" aria-pressed="true">Most photos</button>
+        <button data-sort="first" aria-pressed="false">First seen</button>
+        <button data-sort="name" aria-pressed="false">Name</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="sw"></i> confident</span>
+      <span><i class="sw u"></i> uncertain link to this cat</span>
+      <span><i class="sw d"></i> duplicate detection</span>
+      <span>Click any crop to mark it right or wrong.</span>
+    </div>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section id="tab-review" hidden>
+    <div id="ro" class="ro-note" hidden>Your answers can't be saved in this view, so the buttons are read-only.</div>
+    <h2>Same cat?</h2>
+    <p class="sub" style="margin:0 0 14px;max-width:72ch">Left: crops from visits where I'm confident about this cat. Right: a visit where I only think it's the same cat. Kittens change a lot, so these links are the weakest part of the labels.</p>
+    <div id="links"></div>
+    <h2 style="margin-top:28px">Name the cats I couldn't</h2>
+    <p class="sub" style="margin:0 0 14px;max-width:72ch">Crops I marked unidentifiable, by visit. Click one to give it a name if you know the cat.</p>
+    <div id="unknowns"></div>
+    <h2 style="margin-top:28px">Notes for Claude</h2>
+    <div class="panel">
+      <label class="label" for="note">Anything: real cat names, which cats are siblings, ideas, what you want next</label>
+      <textarea id="note" style="margin-top:8px"></textarea>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px"><button class="btn primary" id="save-note">Save note</button><span class="saved" id="note-saved"></span></div>
+      <div class="notes-list" id="notes"></div>
+    </div>
+  </section>
+
+  <section id="tab-experiments" hidden>
+    <h2>How each variant scores</h2>
+    <div class="metric-help">
+      <div><b>Cross-visit top-1</b>: for each labeled crop, is the most similar crop from a different visit the same cat? Same-visit matches are excluded, since burst shots make them trivial.</div>
+      <div><b>Set top-1 / top-3</b>: all crops of one cat from one visit, matched as a group against other visits. Top-3 is the "is it one of these three?" prompt.</div>
+      <div><b>Within-visit F1</b>: B-cubed F1 of clustering one visit's crops by cat (best threshold).</div>
+      <div><b>Open-set</b>: replaying visits in order, does a query get the right known cat, or "new cat" if it has never been seen?</div>
+    </div>
+    <div class="panel tbl-wrap"><table class="res" id="res"></table></div>
+    <h2 style="margin-top:26px">Embedding cost</h2>
+    <div class="panel tbl-wrap"><table class="res" id="speed"></table></div>
+  </section>
+  <footer>Photos never leave this page's own files: only small crops are shown. Code: <span style="font-family:var(--mono)">aadishv/scratchpad</span>, branch <span style="font-family:var(--mono)">claude/pensive-heisenberg-90npvl</span>, folder <span style="font-family:var(--mono)">catid/</span>.</footer>
+</div>
+
+<dialog id="dlg">
+  <div class="row"><div class="sp big" id="dlg-sp"></div>
+    <dl id="dlg-meta"></dl></div>
+  <div class="actions">
+    <button class="btn" id="dlg-ok">Right cat</button>
+    <button class="btn" id="dlg-wrong">Wrong cat</button>
+    <button class="btn" id="dlg-close">Close</button>
+  </div>
+  <div id="dlg-fix" hidden style="margin-top:12px">
+    <label class="label" for="dlg-name">Which cat is it? (a roster name, a real name, or "not a cat")</label>
+    <input class="txt" id="dlg-name" list="catnames" style="margin-top:6px">
+    <datalist id="catnames"></datalist>
+    <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><button class="btn primary" id="dlg-save">Save</button><span class="saved" id="dlg-saved"></span></div>
+  </div>
+</dialog>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v); } for (const c of kids) if (c != null) e.append(c); return e; };
+const base = l => l.replace(/~$/, '');
+const crops = DATA.crops, visits = DATA.visits;
+const vById = Object.fromEntries(visits.map(v => [v.v, v]));
+$('#updated').textContent = 'Updated ' + DATA.updated;
+
+// ---------- feedback state (db) ----------
+const FB = { crop: {}, group: {}, notes: [] };
+let db = null, canWrite = true;
+const rerenders = new Set();
+function refresh() { for (const f of rerenders) f(); }
+
+function sprite(c, size = 76) {
+  const per = DATA.per, a = Math.floor(c.i / (per * per)), j = c.i % (per * per);
+  const b = el('button', { class: 'sp', 'aria-label': `Crop ${c.id}, labeled ${c.lab}` });
+  b.style.width = b.style.height = size + 'px';
+  b.style.backgroundImage = `url(atlas${a}.jpg)`;
+  b.style.backgroundSize = `${per * size}px ${per * size}px`;
+  b.style.backgroundPosition = `-${(j % per) * size}px -${Math.floor(j / per) * size}px`;
+  if (c.lab.endsWith('~')) b.classList.add('unsure');
+  if (!c.p) b.classList.add('dup');
+  const fb = FB.crop[c.id];
+  if (fb) b.classList.add(fb.verdict === 'ok' ? 'ok' : 'flag');
+  b.addEventListener('click', () => openCrop(c));
+  return b;
+}
+
+// ---------- tabs ----------
+function show(tab) {
+  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  document.querySelectorAll('section[id^=tab-]').forEach(s => s.hidden = s.id !== 'tab-' + tab);
+  try { localStorage.setItem('tab', tab); } catch (e) {}
+}
+document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
+{ let t = location.hash.slice(1); if (!t) try { t = localStorage.getItem('tab'); } catch (e) {} if (['overview','roster','review','experiments'].includes(t)) show(t); }
+
+// ---------- overview ----------
+const notes = DATA.notes || { status: [], findings: [], next: [] };
+for (const s of notes.status) $('#status').append(el('li', {}, el('div', {}, el('span', { class: 'pill ' + s.state }, el('i'), s.state)), el('div', {}, el('div', { class: 'stage', text: s.stage }), el('div', { class: 'detail', text: s.detail }))));
+for (const f of notes.findings) $('#findings').append(el('div', { class: 'finding' }, el('h3', { text: f.title }), el('p', { text: f.body })));
+for (const n of notes.next) $('#next').append(el('li', { text: n }));
+
+const R = DATA.results || {};
+const rows = Object.values(R);
+const best = (k) => rows.reduce((m, r) => (r[k] ?? -1) > (m?.[k] ?? -1) ? r : m, null);
+const labeled = crops.filter(c => !['?', 'x'].includes(c.lab));
+const cats = [...new Set(labeled.map(c => base(c.lab)))];
+const kp = [
+  ['Detections', crops.length, `${new Set(crops.map(c => c.id.replace(/_\d+$/, ''))).size} photos, ${visits.length} visits`],
+  ['Cats labeled', cats.length, `${labeled.length} crops named; ${crops.filter(c => c.lab === '?').length} unidentifiable`],
+  ['Best cross-visit top-1', best('loose_top1') ? best('loose_top1').loose_top1.toFixed(2) : '–', best('loose_top1')?.name || ''],
+  ['Best set top-3', best('set_top3') ? best('set_top3').set_top3.toFixed(2) : '–', best('set_top3')?.name || ''],
+  ['Best within-visit F1', best('wv_bF1') ? best('wv_bF1').wv_bF1.toFixed(2) : '–', best('wv_bF1')?.name || ''],
+];
+for (const [k, v, s] of kp) $('#kpis').append(el('div', { class: 'kpi' }, el('span', { class: 'label', text: k }), el('b', { text: String(v) }), el('small', { text: s })));
+
+// presence chart
+const byCat = {};
+for (const c of labeled) (byCat[base(c.lab)] ||= []).push(c);
+const firstSeen = n => Math.min(...byCat[n].map(c => c.v));
+{
+  const t = $('#presence');
+  const hr = el('tr', {}, el('th'));
+  for (const v of visits) hr.append(el('th', { class: 'vh', title: `${v.dow} ${v.iso}: ${v.photos} photos`, text: v.date }));
+  t.append(hr);
+  for (const n of [...cats].sort((a, b) => firstSeen(a) - firstSeen(b) || byCat[b].length - byCat[a].length)) {
+    const tr = el('tr', {}, el('td', { class: 'name', text: n, onclick: () => { show('roster'); $('#q').value = n; renderCats(); } }));
+    for (const v of visits) {
+      const cs = byCat[n].filter(c => c.v === v.v); const td = el('td');
+      if (cs.length) { const d = Math.min(16, 6 + 2 * Math.sqrt(cs.length)); const dot = el('span', { class: 'dot' + (cs.every(c => c.lab.endsWith('~')) ? ' unsure' : ''), title: `${n}: ${cs.length} crops on ${v.date}` }); dot.style.width = dot.style.height = d + 'px'; td.append(dot); }
+      tr.append(td);
+    }
+    t.append(tr);
+  }
+}
+
+// ---------- roster ----------
+let sortBy = 'count';
+const expanded = new Set();
+document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { sortBy = b.dataset.sort; document.querySelectorAll('[data-sort]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderCats(); }));
+$('#q').addEventListener('input', () => renderCats());
+for (const n of cats.sort()) $('#catnames').append(el('option', { value: n }));
+function renderCats() {
+  const q = $('#q').value.trim().toLowerCase();
+  let names = cats.filter(n => !q || n.toLowerCase().includes(q));
+  names.sort(sortBy === 'count' ? (a, b) => byCat[b].length - byCat[a].length : sortBy === 'first' ? (a, b) => firstSeen(a) - firstSeen(b) : (a, b) => a.localeCompare(b));
+  const box = $('#cats'); box.replaceChildren();
+  for (const n of names) {
+    const cs = byCat[n]; const vs = [...new Set(cs.map(c => c.v))];
+    const cols = {}; cs.forEach(c => { if (c.col) cols[c.col] = (cols[c.col] || 0) + 1; });
+    const colTxt = Object.entries(cols).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ×${v}`).join(', ');
+    const head = el('div', { class: 'cat-head' }, el('h3', { text: n }), el('span', { class: 'meta', text: `${cs.length} crops · ${vs.length} visits` + (colTxt ? ` · collar seen: ${colTxt}` : '') }));
+    const strip = el('div', { class: 'vstrip' });
+    for (const v of visits) { const here = cs.filter(c => c.v === v.v); if (!here.length) continue; strip.append(el('span', { class: here.every(c => c.lab.endsWith('~')) ? 'unsure' : 'on', text: v.date })); }
+    const card = el('div', { class: 'cat' }, head, strip);
+    const open = expanded.has(n);
+    const show_ = open ? cs : cs.slice(0, 24);
+    const grid = el('div', { class: 'crops' }); show_.forEach(c => grid.append(sprite(c)));
+    card.append(grid);
+    if (cs.length > 24) card.append(el('button', { class: 'more', text: open ? 'Show fewer' : `Show all ${cs.length}`, onclick: () => { open ? expanded.delete(n) : expanded.add(n); renderCats(); } }));
+    box.append(card);
+  }
+}
+renderCats(); rerenders.add(renderCats);
+
+// ---------- review: uncertain links ----------
+const groups = {};
+for (const c of labeled) { const k = base(c.lab) + '__v' + c.v; (groups[k] ||= { cat: base(c.lab), v: c.v, cs: [] }).cs.push(c); }
+const unsureGroups = Object.entries(groups).filter(([k, g]) => g.cs.every(c => c.lab.endsWith('~'))).sort((a, b) => a[1].v - b[1].v);
+function renderLinks() {
+  const box = $('#links'); box.replaceChildren();
+  let open = 0;
+  for (const [k, g] of unsureGroups) {
+    const ans = FB.group[k]?.same; if (!ans) open++;
+    const anchor = byCat[g.cat].filter(c => !c.lab.endsWith('~') && c.p).slice(0, 6);
+    const left = el('div', {}, el('span', { class: 'label', text: anchor.length ? `${g.cat}, confident visits` : `${g.cat}: no confident crops yet` }), el('div', { class: 'crops', style: 'margin-top:6px' }, ...anchor.map(c => sprite(c, 92))));
+    const right = el('div', {}, el('span', { class: 'label', text: `${vById[g.v].date} visit` }), el('div', { class: 'crops', style: 'margin-top:6px' }, ...g.cs.filter(c => c.p).slice(0, 6).map(c => sprite(c, 92))));
+    const ask = el('div', { class: 'ask' }, el('span', { text: `Is the cat on ${vById[g.v].date} ${g.cat}?` }));
+    for (const [val, txt] of [['yes', 'Same cat'], ['no', 'Different cat'], ['unsure', "Can't tell"]]) {
+      const b = el('button', { class: 'btn' + (ans === val ? ' sel-' + val : ''), text: txt });
+      if (!canWrite) b.disabled = true;
+      b.addEventListener('click', () => saveGroup(k, val));
+      ask.append(b);
+    }
+    box.append(el('div', { class: 'q' + (ans ? ' answered' : '') }, el('div', { class: 'pair' }, left, right), ask));
+  }
+  $('#qcount').textContent = open ? `(${open})` : '';
+}
+renderLinks(); rerenders.add(renderLinks);
+
+function renderUnknowns() {
+  const box = $('#unknowns'); box.replaceChildren();
+  for (const v of visits) {
+    const cs = crops.filter(c => c.v === v.v && c.lab === '?' && c.p);
+    if (!cs.length) continue;
+    box.append(el('div', { class: 'vgroup' }, el('span', { class: 'label', text: `${v.dow} ${v.date} · ${cs.length}` }), el('div', { class: 'crops' }, ...cs.map(c => sprite(c, 64)))));
+  }
+}
+renderUnknowns(); rerenders.add(renderUnknowns);
+
+// ---------- crop dialog ----------
+let cur = null;
+function openCrop(c) {
+  cur = c;
+  const sp = sprite(c, 128); sp.disabled = true; $('#dlg-sp').replaceWith(Object.assign(sp, { id: 'dlg-sp' }));
+  const fb = FB.crop[c.id];
+  const meta = [['Labeled', c.lab === '?' ? 'unidentified' : c.lab.replace(/~$/, ' (uncertain)')], ['Visit', `${vById[c.v].dow} ${vById[c.v].iso} ${c.t}`], ['Collar', c.col || 'not seen'], ['Detector', `conf ${c.conf}${c.p ? '' : ', duplicate'}`], ['Your call', fb ? (fb.verdict === 'ok' ? 'right cat' : 'wrong → ' + (fb.name || '?')) : '–'], ['Id', c.id]];
+  $('#dlg-meta').replaceChildren(...meta.flatMap(([k, v]) => [el('dt', { text: k }), el('dd', { text: v })]));
+  $('#dlg-fix').hidden = c.lab !== '?' && !(fb && fb.verdict === 'wrong');
+  $('#dlg-name').value = fb?.name || '';
+  $('#dlg-saved').textContent = '';
+  for (const b of ['#dlg-ok', '#dlg-wrong', '#dlg-save']) $(b).disabled = !canWrite;
+  $('#dlg-ok').hidden = c.lab === '?';
+  $('#dlg-wrong').hidden = c.lab === '?';
+  $('#dlg').showModal();
+}
+$('#dlg-close').addEventListener('click', () => $('#dlg').close());
+$('#dlg-ok').addEventListener('click', async () => { await saveCrop(cur, { verdict: 'ok' }); $('#dlg').close(); });
+$('#dlg-wrong').addEventListener('click', () => { $('#dlg-fix').hidden = false; $('#dlg-name').focus(); });
+$('#dlg-save').addEventListener('click', async () => { const name = $('#dlg-name').value.trim(); await saveCrop(cur, { verdict: cur.lab === '?' ? 'named' : 'wrong', name }); $('#dlg-saved').textContent = 'Saved'; });
+
+// ---------- writes ----------
+async function saveCrop(c, body) {
+  FB.crop[c.id] = { ...body, label: c.lab }; refresh();
+  if (!db) return;
+  try { await db.collection('crop_fb').doc(c.id).set({ ...body, label: c.lab, at: new Date().toISOString() }); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
+async function saveGroup(k, val) {
+  FB.group[k] = { same: val }; refresh();
+  if (!db) return;
+  try { await db.collection('group_fb').doc(k).set({ same: val, at: new Date().toISOString() }); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
+$('#save-note').addEventListener('click', async () => {
+  const text = $('#note').value.trim(); if (!text || !db) return;
+  try { await db.collection('notes').add({ text, at: new Date().toISOString() }); $('#note').value = ''; $('#note-saved').textContent = 'Saved'; setTimeout(() => $('#note-saved').textContent = '', 2500); }
+  catch (e) { $('#note-saved').textContent = e?.code === 'invalid_argument' ? "Can't save in this view" : 'Not saved, try again'; }
+});
+function renderNotes() { $('#notes').replaceChildren(...FB.notes.map(n => el('div', {}, n.text, el('small', { text: new Date(n.at).toLocaleString() })))); }
+rerenders.add(renderNotes);
+function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-note').disabled = true; refresh(); }
+
+(async () => {
+  db = await window.claude?.use?.('db') ?? null;
+  const user = await window.claude?.use?.('user') ?? null;
+  if (!db) { setReadOnly(); return; }
+  const w = user ? await user.can('data.write') : null;
+  if (w === false) setReadOnly();
+  db.collection('crop_fb').onSnapshot(s => { FB.crop = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
+  db.collection('group_fb').onSnapshot(s => { FB.group = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
+  db.collection('notes').orderBy('at', 'desc').limit(100).onSnapshot(s => { FB.notes = s.docs.map(d => d.data()); renderNotes(); }, () => {});
+})();
+
+// ---------- experiments ----------
+const COLS = [['name', 'Variant'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];
+let sortCol = 'loose_top1';
+function renderRes() {
+  const t = $('#res'); t.replaceChildren();
+  const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes(); } })); t.append(hr);
+  const rs = [...rows].sort((a, b) => sortCol === 'name' ? a.name.localeCompare(b.name) : (b[sortCol] ?? -1) - (a[sortCol] ?? -1));
+  const top = rs[0]?.name;
+  const mx = Math.max(...rows.map(r => r.loose_top1 || 0), 0.01);
+  for (const r of rs) {
+    const tr = el('tr', { class: r.name === top && sortCol !== 'name' ? 'best' : '' });
+    for (const [k] of COLS) {
+      if (k === 'name') { tr.append(el('td', { class: 'n', text: r.name.replace('__', ' · ') })); continue; }
+      const v = r[k]; const td = el('td');
+      if (k === 'loose_top1' && v != null) { const b = el('span', { class: 'bar' }); b.style.width = (60 * v / mx) + 'px'; td.append(b); }
+      td.append(v == null || Number.isNaN(v) ? '–' : v.toFixed(3)); tr.append(td);
+    }
+    t.append(tr);
+  }
+}
+renderRes();
+{
+  const t = $('#speed'); t.append(el('tr', {}, ...['Embedding', 'Variant', 'Dim', 'ms per crop (4 CPU threads)'].map(x => el('th', { text: x }))));
+  for (const [k, m] of Object.entries(DATA.emb || {}).sort((a, b) => a[1].ms_per_crop - b[1].ms_per_crop)) {
+    t.append(el('tr', {}, el('td', { class: 'n', text: m.model }), el('td', { text: m.variant + (m.tta ? ' + flip TTA' : '') }), el('td', { text: String(m.dim) }), el('td', { text: m.ms_per_crop.toFixed(0) })));
+  }
+}
+</script>

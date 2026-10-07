@@ -53,3 +53,24 @@ def bcubed(pred, y):
     p, r = np.mean(P), np.mean(R)
     return {'bP': p, 'bR': r, 'bF1': 2 * p * r / (p + r), 'ARI': adjusted_rand_score(y, pred),
             'n_clusters': len(np.unique(pred)), 'n_cats': len(np.unique(y))}
+
+def set_retrieval(S, y, sess, agg='mean'):
+    """Group-level cross-visit ID: each (visit, cat) group is a query set; gallery = all groups of OTHER visits.
+    Set similarity = mean pairwise sim ('mean') or mean over query items of their best gallery match ('maxmean').
+    Returns top-1 / top-3 accuracy over groups whose cat appears in another visit."""
+    keys = sorted(set(zip(sess.tolist(), y.tolist())))
+    idx = {k: np.nonzero((sess == k[0]) & (y == k[1]))[0] for k in keys}
+    hits1 = hits3 = n = 0
+    for q in keys:
+        cands = [g for g in keys if g[0] != q[0]]
+        if not any(g[1] == q[1] for g in cands): continue
+        sims = []
+        for g in cands:
+            B = S[np.ix_(idx[q], idx[g])]
+            sims.append(B.mean() if agg == 'mean' else B.max(1).mean())
+        # collapse gallery groups to identities (best group per identity)
+        best = {}
+        for g, s in zip(cands, sims): best[g[1]] = max(best.get(g[1], -9), s)
+        ranked = sorted(best, key=lambda c: -best[c])
+        n += 1; hits1 += ranked[0] == q[1]; hits3 += q[1] in ranked[:3]
+    return {'set_top1': hits1 / n, 'set_top3': hits3 / n, 'n_sets': n}

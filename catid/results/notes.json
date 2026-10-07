@@ -1,0 +1,23 @@
+{
+ "status": [
+  {"stage": "Photos", "state": "done", "detail": "587 photos from 28 visits (Apr 22 to Oct 6). Videos deleted."},
+  {"stage": "Detection", "state": "done", "detail": "YOLO11x-seg at 1024px: 975 cat detections in 576 photos. 1.8 s per photo on 4 CPUs. A helper session is benchmarking faster detectors."},
+  {"stage": "Hand labels", "state": "done", "detail": "First pass: 652 crops named across 56 cats; 320 marked unidentifiable; 3 false detections. Needs your review."},
+  {"stage": "Embeddings", "state": "running", "detail": "Local: DINOv2, CLIP, MegaDescriptor-T, SigLIP2, DINOv3 (B sizes). Helper sessions: DINOv2-L, DINOv3-L, SigLIP2-so400m, CLIP-L, MegaDescriptor-L, MiewID."},
+  {"stage": "Heuristics", "state": "running", "detail": "Duplicate removal, collar colour, burst pooling, whitening, re-ranking done on DINOv2-B. Learned projection head next."}
+ ],
+ "findings": [
+  {"title": "Two detections in one photo are usually the same cat", "body": "Of 215 labeled same-photo detection pairs, 155 were the same cat: YOLO splits a cat at the collar or a hand, or fires twice (cat + dog class). The textbook rule 'detections in one photo are different individuals' would be wrong most of the time here. Merging detections whose masks overlap by more than 50% removes 148 duplicates (78% of them) and wrongly merges 8% of real pairs, mostly cats piled together. Within-visit grouping F1 jumped from 0.74 to 0.83."},
+  {"title": "Collar colour is the single best cheap feature", "body": "Segmentation masks stop at the collar, so the colour is read from a 10px ring around the mask. Pink collars are pale (saturation 0.25 to 0.55) and blue jeans are everywhere, so each colour has its own rule. When it fires it is almost never wrong; it fires on roughly a third of crops. Adding it as a soft bonus or penalty lifts cross-visit top-1 from 0.41 to 0.46 on DINOv2-B."},
+  {"title": "Some collars carry the cat's name", "body": "Handwritten names are visible on several collars (Jade, Rocky, '... Bean'). They are anchors for cross-visit identity in the labels, and reading them with OCR is a candidate heuristic."},
+  {"title": "Same visit is easy, a new visit is hard", "body": "Grouping crops of one visit by cat reaches B-cubed F1 0.83. Recognising a cat on a different visit gives top-1 around 0.4, and the right cat is in the top 3 about 70% of the time at the set level. Kittens change fast (eye colour, size, colourpoint darkening), so the gallery has to keep updating."},
+  {"title": "Generic tricks barely help", "body": "PCA whitening and k-reciprocal re-ranking do not help, and h-flip TTA is neutral. Pooling burst shots gives +1 point. Background masking and the learned head are being measured next."}
+ ],
+ "next": [
+  "Compare all 12 embedding models on crops and on background-masked crops",
+  "Learned projection head from your labels (leave-visits-out cross-validation)",
+  "Collar name OCR; coat-colour attribute gating with CLIP zero-shot",
+  "Open-set 'new cat' detection with a calibrated threshold plus a recency prior (cats come and go)",
+  "Fast pipeline: smaller detector, ONNX/OpenVINO, one shared backbone"
+ ]
+}

@@ -1,0 +1,1430 @@
+[
+{
+"name": "Cheeto",
+"sex": "Male",
+"born": "Jun 17, 2026",
+"intake": "Aug 28, 2026",
+"photo": "listing/Cheeto.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4338",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260924_235215674_0",
+"score": 0.718
+},
+{
+"id": "PXL_20260911_220945654_0",
+"score": 0.689
+},
+{
+"id": "PXL_20260903_012552035.PORTRAIT_0",
+"score": 0.68
+},
+{
+"id": "PXL_20260924_235201479_0",
+"score": 0.679
+},
+{
+"id": "PXL_20260911_215756307_0",
+"score": 0.67
+},
+{
+"id": "PXL_20260924_235037192_0",
+"score": 0.667
+},
+{
+"id": "PXL_20260924_235049332_0",
+"score": 0.656
+},
+{
+"id": "PXL_20260911_220957133_0",
+"score": 0.655
+},
+{
+"id": "PXL_20260908_220707072_0",
+"score": 0.644
+},
+{
+"id": "PXL_20260908_232400386.PORTRAIT_0",
+"score": 0.639
+}
+]
+},
+{
+"name": "Coriander",
+"sex": "Male",
+"born": "Sep 4, 2025",
+"intake": "Feb 14, 2026",
+"photo": "listing/Coriander.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3837",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260720_222247796_0",
+"score": 0.712
+},
+{
+"id": "PXL_20260720_222247796_1",
+"score": 0.696
+},
+{
+"id": "PXL_20260814_221549748.PORTRAIT_0",
+"score": 0.685
+},
+{
+"id": "PXL_20260720_222243471_0",
+"score": 0.67
+},
+{
+"id": "PXL_20260724_210804382_0",
+"score": 0.659
+},
+{
+"id": "PXL_20260804_233627998.PORTRAIT_0",
+"score": 0.65
+},
+{
+"id": "PXL_20260804_232846827.PORTRAIT_0",
+"score": 0.645
+},
+{
+"id": "PXL_20260804_232852484.PORTRAIT_0",
+"score": 0.638
+},
+{
+"id": "PXL_20261003_020801953_0",
+"score": 0.637
+},
+{
+"id": "PXL_20260813_223649594.PORTRAIT.ORIGINAL_0",
+"score": 0.629
+}
+]
+},
+{
+"name": "Delilah",
+"sex": "Female",
+"born": "Jun 20, 2025",
+"intake": "Jun 21, 2026",
+"photo": "listing/Delilah.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4235",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260917_002906331_0",
+"score": 0.707
+},
+{
+"id": "PXL_20260911_213751950_0",
+"score": 0.704
+},
+{
+"id": "PXL_20260925_012838115_0",
+"score": 0.677
+},
+{
+"id": "PXL_20261003_012506341_0",
+"score": 0.671
+},
+{
+"id": "PXL_20261007_011815512_0",
+"score": 0.65
+},
+{
+"id": "PXL_20260929_012858616_0",
+"score": 0.645
+},
+{
+"id": "PXL_20261003_011749853_0",
+"score": 0.624
+},
+{
+"id": "PXL_20260911_211616647_0",
+"score": 0.62
+},
+{
+"id": "PXL_20261007_011809556_0",
+"score": 0.616
+},
+{
+"id": "PXL_20260911_211619255_0",
+"score": 0.608
+}
+]
+},
+{
+"name": "Dorito",
+"sex": "Male",
+"born": "Jun 17, 2026",
+"intake": "Aug 28, 2026",
+"photo": "listing/Dorito.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4339",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20261003_015716252_0",
+"score": 0.611
+},
+{
+"id": "PXL_20260924_235049332_0",
+"score": 0.584
+},
+{
+"id": "PXL_20261003_015719250_0",
+"score": 0.583
+},
+{
+"id": "PXL_20261007_002159943_0",
+"score": 0.571
+},
+{
+"id": "PXL_20260908_222012640.PORTRAIT_0",
+"score": 0.569
+},
+{
+"id": "PXL_20260903_012552035.PORTRAIT_0",
+"score": 0.568
+},
+{
+"id": "PXL_20261007_003142571_0",
+"score": 0.565
+},
+{
+"id": "PXL_20260902_232536763_0",
+"score": 0.559
+},
+{
+"id": "PXL_20260908_220531594.PORTRAIT_0",
+"score": 0.555
+},
+{
+"id": "PXL_20261007_002858741_0",
+"score": 0.554
+}
+]
+},
+{
+"name": "Ebi",
+"sex": "Female",
+"born": "Jul 10, 2026",
+"intake": "Sep 5, 2026",
+"photo": "listing/Ebi.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4350",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260924_235037192_0",
+"score": 0.629
+},
+{
+"id": "PXL_20260924_235049332_0",
+"score": 0.627
+},
+{
+"id": "PXL_20260908_232400386.PORTRAIT_0",
+"score": 0.614
+},
+{
+"id": "PXL_20260924_235201479_0",
+"score": 0.612
+},
+{
+"id": "PXL_20261007_002159943_1",
+"score": 0.604
+},
+{
+"id": "PXL_20260924_235215674_0",
+"score": 0.584
+},
+{
+"id": "PXL_20261007_010324944_0",
+"score": 0.567
+},
+{
+"id": "PXL_20260911_215756307_0",
+"score": 0.56
+},
+{
+"id": "PXL_20260908_220654446_0",
+"score": 0.55
+},
+{
+"id": "PXL_20261007_002159943_0",
+"score": 0.546
+}
+]
+},
+{
+"name": "Eclipse",
+"sex": "Female",
+"born": "Oct 10, 2025",
+"intake": "Feb 14, 2026",
+"photo": "listing/Eclipse.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3863",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260911_231550901_0",
+"score": 0.743
+},
+{
+"id": "PXL_20260911_223253691_0",
+"score": 0.737
+},
+{
+"id": "PXL_20260814_235958291_0",
+"score": 0.707
+},
+{
+"id": "PXL_20260818_011210080_0",
+"score": 0.698
+},
+{
+"id": "PXL_20260911_223302009.PORTRAIT_0",
+"score": 0.696
+},
+{
+"id": "PXL_20260911_231556830_0",
+"score": 0.694
+},
+{
+"id": "PXL_20260908_213511681_0",
+"score": 0.684
+},
+{
+"id": "PXL_20260907_005243941_0",
+"score": 0.676
+},
+{
+"id": "PXL_20260814_224554996_0",
+"score": 0.654
+},
+{
+"id": "PXL_20260804_221750868.PORTRAIT_0",
+"score": 0.648
+}
+]
+},
+{
+"name": "Lucille",
+"sex": "Female",
+"born": "Mar 25, 2026",
+"intake": "May 10, 2026",
+"photo": "listing/Lucille.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4082",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260709_232540362_0",
+"score": 0.592
+},
+{
+"id": "PXL_20260709_232538734_0",
+"score": 0.574
+},
+{
+"id": "PXL_20260720_215424955_1",
+"score": 0.561
+},
+{
+"id": "PXL_20260710_000137317_0",
+"score": 0.551
+},
+{
+"id": "PXL_20260709_224335778_0",
+"score": 0.541
+},
+{
+"id": "PXL_20260911_233305266_1",
+"score": 0.527
+},
+{
+"id": "PXL_20260918_231514300_0",
+"score": 0.515
+},
+{
+"id": "PXL_20260917_011819526_0",
+"score": 0.512
+},
+{
+"id": "PXL_20260911_224705929_0",
+"score": 0.512
+},
+{
+"id": "PXL_20260724_231121044_0",
+"score": 0.494
+}
+]
+},
+{
+"name": "McFlurry",
+"sex": "Male",
+"born": "Jul 22, 2026",
+"intake": "Aug 23, 2026",
+"photo": "listing/McFlurry.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4304",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20261007_010724779_0",
+"score": 0.875
+},
+{
+"id": "PXL_20261007_010732730_0",
+"score": 0.833
+},
+{
+"id": "PXL_20260908_235421424_0",
+"score": 0.694
+},
+{
+"id": "PXL_20260908_235425158_0",
+"score": 0.679
+},
+{
+"id": "PXL_20260908_235423634_0",
+"score": 0.669
+},
+{
+"id": "PXL_20260908_235527151_0",
+"score": 0.667
+},
+{
+"id": "PXL_20260908_235426570_0",
+"score": 0.666
+},
+{
+"id": "PXL_20260908_235526891_0",
+"score": 0.665
+},
+{
+"id": "PXL_20260908_235527561_0",
+"score": 0.659
+},
+{
+"id": "PXL_20260908_235525824_0",
+"score": 0.653
+}
+]
+},
+{
+"name": "Microwave",
+"sex": "Male",
+"born": "May 26, 2026",
+"intake": "Jun 30, 2026",
+"photo": "listing/Microwave.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4253",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260929_003745722_0",
+"score": 0.49
+},
+{
+"id": "PXL_20261006_225946304_0",
+"score": 0.48
+},
+{
+"id": "PXL_20261006_225945170_0",
+"score": 0.479
+},
+{
+"id": "PXL_20260813_235758164_1",
+"score": 0.475
+},
+{
+"id": "PXL_20260824_015833474_0",
+"score": 0.468
+},
+{
+"id": "PXL_20260911_235600481_0",
+"score": 0.443
+},
+{
+"id": "PXL_20260828_005500549_0",
+"score": 0.439
+},
+{
+"id": "PXL_20260911_235810592_0",
+"score": 0.43
+},
+{
+"id": "PXL_20260911_235601309_0",
+"score": 0.429
+},
+{
+"id": "PXL_20260929_003745722_1",
+"score": 0.429
+}
+]
+},
+{
+"name": "Nacho",
+"sex": "Female",
+"born": "Oct 4, 2025",
+"intake": "Feb 14, 2026",
+"photo": "listing/Nacho.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3832",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20261007_010324944_0",
+"score": 0.754
+},
+{
+"id": "PXL_20261007_010537165_0",
+"score": 0.728
+},
+{
+"id": "PXL_20261007_010320307_0",
+"score": 0.683
+},
+{
+"id": "PXL_20261007_010317875_0",
+"score": 0.674
+},
+{
+"id": "PXL_20260903_012552035.PORTRAIT_0",
+"score": 0.663
+},
+{
+"id": "PXL_20260818_012022546_0",
+"score": 0.661
+},
+{
+"id": "PXL_20261003_015716252_0",
+"score": 0.657
+},
+{
+"id": "PXL_20260924_235157429_0",
+"score": 0.651
+},
+{
+"id": "PXL_20260908_234559503_0",
+"score": 0.631
+},
+{
+"id": "PXL_20260924_235049332_0",
+"score": 0.631
+}
+]
+},
+{
+"name": "Nugget",
+"sex": "Female",
+"born": "Jul 22, 2026",
+"intake": "Aug 23, 2026",
+"photo": "listing/Nugget.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4302",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260902_233550824_0",
+"score": 0.593
+},
+{
+"id": "PXL_20260902_232348162_0",
+"score": 0.568
+},
+{
+"id": "PXL_20260902_234810213_0",
+"score": 0.546
+},
+{
+"id": "PXL_20260904_222729317_0",
+"score": 0.441
+},
+{
+"id": "PXL_20260904_222731618_0",
+"score": 0.411
+},
+{
+"id": "PXL_20260911_224705929_0",
+"score": 0.301
+},
+{
+"id": "PXL_20260929_010337028_0",
+"score": 0.26
+},
+{
+"id": "PXL_20261006_233506314_0",
+"score": 0.255
+},
+{
+"id": "PXL_20260924_232551453_0",
+"score": 0.241
+},
+{
+"id": "PXL_20261006_233505085_0",
+"score": 0.225
+}
+]
+},
+{
+"name": "Orca",
+"sex": "Female",
+"born": "Jul 16, 2026",
+"intake": "Aug 27, 2026",
+"photo": "listing/Orca.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4335",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260917_011819526_0",
+"score": 0.525
+},
+{
+"id": "PXL_20261006_234940650_0",
+"score": 0.486
+},
+{
+"id": "PXL_20260929_013034721_0",
+"score": 0.485
+},
+{
+"id": "PXL_20261003_020759598_1",
+"score": 0.474
+},
+{
+"id": "PXL_20260911_222514636_0",
+"score": 0.471
+},
+{
+"id": "PXL_20260929_012858616_0",
+"score": 0.465
+},
+{
+"id": "PXL_20260917_012040926_3",
+"score": 0.46
+},
+{
+"id": "PXL_20260911_211618643_0",
+"score": 0.46
+},
+{
+"id": "PXL_20261003_011329673_0",
+"score": 0.458
+},
+{
+"id": "PXL_20260911_233305266_1",
+"score": 0.45
+}
+]
+},
+{
+"name": "Otter",
+"sex": "Female",
+"born": "Jul 16, 2026",
+"intake": "Aug 27, 2026",
+"photo": "listing/Otter.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4337",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260929_010337028_0",
+"score": 0.664
+},
+{
+"id": "PXL_20260929_003745722_1",
+"score": 0.65
+},
+{
+"id": "PXL_20260911_223253691_0",
+"score": 0.647
+},
+{
+"id": "PXL_20260911_231550901_0",
+"score": 0.631
+},
+{
+"id": "PXL_20260911_223302009.PORTRAIT_0",
+"score": 0.62
+},
+{
+"id": "PXL_20261006_225946304_0",
+"score": 0.612
+},
+{
+"id": "PXL_20260908_213511681_0",
+"score": 0.597
+},
+{
+"id": "PXL_20260907_005243941_0",
+"score": 0.591
+},
+{
+"id": "PXL_20261003_020248775_0",
+"score": 0.581
+},
+{
+"id": "PXL_20260911_235600481_0",
+"score": 0.565
+}
+]
+},
+{
+"name": "Panda Bear",
+"sex": "Male",
+"born": "Apr 12, 2026",
+"intake": "May 12, 2026",
+"photo": "listing/Panda_Bear.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4111",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260814_224558437.PORTRAIT_0",
+"score": 0.747
+},
+{
+"id": "PXL_20260804_224822289_0",
+"score": 0.701
+},
+{
+"id": "PXL_20260804_224830898.PORTRAIT.ORIGINAL_0",
+"score": 0.668
+},
+{
+"id": "PXL_20260804_221750868.PORTRAIT_0",
+"score": 0.607
+},
+{
+"id": "PXL_20260804_221748729.PORTRAIT_0",
+"score": 0.592
+},
+{
+"id": "PXL_20260720_220029986_0",
+"score": 0.591
+},
+{
+"id": "PXL_20260814_224554996_0",
+"score": 0.589
+},
+{
+"id": "PXL_20260806_235851277_0",
+"score": 0.588
+},
+{
+"id": "PXL_20260804_221750053.PORTRAIT_0",
+"score": 0.587
+},
+{
+"id": "PXL_20260804_221745680.PORTRAIT_0",
+"score": 0.584
+}
+]
+},
+{
+"name": "Paprika",
+"sex": "Female",
+"born": "Sep 10, 2025",
+"intake": "Feb 12, 2026",
+"photo": "listing/Paprika.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3853",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260724_231121044_1",
+"score": 0.752
+},
+{
+"id": "PXL_20260911_215618432.PORTRAIT_0",
+"score": 0.719
+},
+{
+"id": "PXL_20260916_233436786_0",
+"score": 0.65
+},
+{
+"id": "PXL_20260705_194134214_0",
+"score": 0.617
+},
+{
+"id": "PXL_20260705_194127139_0",
+"score": 0.612
+},
+{
+"id": "PXL_20260904_234559068_0",
+"score": 0.611
+},
+{
+"id": "PXL_20260924_230824484_0",
+"score": 0.607
+},
+{
+"id": "PXL_20260925_002648225_0",
+"score": 0.602
+},
+{
+"id": "PXL_20260924_230825836_0",
+"score": 0.602
+},
+{
+"id": "PXL_20260724_231125498_0",
+"score": 0.601
+}
+]
+},
+{
+"name": "Pearl",
+"sex": "Female",
+"born": "Mar 3, 2026",
+"intake": "Apr 8, 2026",
+"photo": "listing/Pearl.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3988",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260724_210804382_0",
+"score": 0.797
+},
+{
+"id": "PXL_20260804_233627998.PORTRAIT_0",
+"score": 0.768
+},
+{
+"id": "PXL_20260828_001434110_0",
+"score": 0.764
+},
+{
+"id": "PXL_20260828_001432712_0",
+"score": 0.755
+},
+{
+"id": "PXL_20260720_222247796_0",
+"score": 0.748
+},
+{
+"id": "PXL_20260720_222243471_0",
+"score": 0.747
+},
+{
+"id": "PXL_20260804_232846827.PORTRAIT_0",
+"score": 0.736
+},
+{
+"id": "PXL_20260720_222247796_1",
+"score": 0.725
+},
+{
+"id": "PXL_20260814_221549748.PORTRAIT_0",
+"score": 0.721
+},
+{
+"id": "PXL_20260804_232852484.PORTRAIT_0",
+"score": 0.714
+}
+]
+},
+{
+"name": "Penguin",
+"sex": "Female",
+"born": "Jul 16, 2026",
+"intake": "Aug 27, 2026",
+"photo": "listing/Penguin.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4334",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260911_233305266_1",
+"score": 0.422
+},
+{
+"id": "PXL_20260911_233435229_0",
+"score": 0.422
+},
+{
+"id": "PXL_20260911_233435229_1",
+"score": 0.382
+},
+{
+"id": "PXL_20260917_011819526_0",
+"score": 0.35
+},
+{
+"id": "PXL_20260827_230254391_2",
+"score": 0.319
+},
+{
+"id": "PXL_20260911_224020014_1",
+"score": 0.316
+},
+{
+"id": "PXL_20260904_235332614_0",
+"score": 0.307
+},
+{
+"id": "PXL_20260911_222514636_0",
+"score": 0.303
+},
+{
+"id": "PXL_20261007_004929830_0",
+"score": 0.289
+},
+{
+"id": "PXL_20260911_233305266_0",
+"score": 0.284
+}
+]
+},
+{
+"name": "Pigeon",
+"sex": "Female",
+"born": "Mar 11, 2026",
+"intake": "Apr 4, 2026",
+"photo": "listing/Pigeon.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-3974",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260805_001906154_0",
+"score": 0.778
+},
+{
+"id": "PXL_20260828_001432712_0",
+"score": 0.742
+},
+{
+"id": "PXL_20260806_212433552_0",
+"score": 0.737
+},
+{
+"id": "PXL_20261003_020801953_0",
+"score": 0.732
+},
+{
+"id": "PXL_20260727_225913608_0",
+"score": 0.724
+},
+{
+"id": "PXL_20260828_001434110_0",
+"score": 0.715
+},
+{
+"id": "PXL_20260804_214142744_0",
+"score": 0.706
+},
+{
+"id": "PXL_20261003_020759598_0",
+"score": 0.702
+},
+{
+"id": "PXL_20260724_210804382_0",
+"score": 0.698
+},
+{
+"id": "PXL_20260814_233456674.PORTRAIT.ORIGINAL_0",
+"score": 0.687
+}
+]
+},
+{
+"name": "Ranger",
+"sex": "Male",
+"born": "Jul 15, 2026",
+"intake": "Sep 15, 2026",
+"photo": "listing/Ranger.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4371",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260929_010337028_0",
+"score": 0.708
+},
+{
+"id": "PXL_20260929_003745722_1",
+"score": 0.703
+},
+{
+"id": "PXL_20261003_020248775_0",
+"score": 0.671
+},
+{
+"id": "PXL_20260929_003531325_0",
+"score": 0.663
+},
+{
+"id": "PXL_20260929_000348673_0",
+"score": 0.622
+},
+{
+"id": "PXL_20260929_003524364_0",
+"score": 0.613
+},
+{
+"id": "PXL_20260929_000356157_0",
+"score": 0.605
+},
+{
+"id": "PXL_20260929_003745722_0",
+"score": 0.58
+},
+{
+"id": "PXL_20261006_225946304_0",
+"score": 0.557
+},
+{
+"id": "PXL_20261007_010540525_0",
+"score": 0.493
+}
+]
+},
+{
+"name": "Sable",
+"sex": "Female",
+"born": "Jul 5, 2024",
+"intake": "Jul 26, 2026",
+"photo": "listing/Sable.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-2902",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260911_223253691_0",
+"score": 0.717
+},
+{
+"id": "PXL_20260814_235958291_0",
+"score": 0.71
+},
+{
+"id": "PXL_20260911_223302009.PORTRAIT_0",
+"score": 0.707
+},
+{
+"id": "PXL_20260818_011210080_0",
+"score": 0.69
+},
+{
+"id": "PXL_20260908_213511681_0",
+"score": 0.69
+},
+{
+"id": "PXL_20260911_231550901_0",
+"score": 0.683
+},
+{
+"id": "PXL_20260908_213515496.PORTRAIT_0",
+"score": 0.666
+},
+{
+"id": "PXL_20260911_235600481_0",
+"score": 0.656
+},
+{
+"id": "PXL_20261003_020248775_0",
+"score": 0.655
+},
+{
+"id": "PXL_20260824_015833474_0",
+"score": 0.655
+}
+]
+},
+{
+"name": "Scout",
+"sex": "Female",
+"born": "Jul 15, 2026",
+"intake": "Sep 15, 2026",
+"photo": "listing/Scout.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4372",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260929_010337028_0",
+"score": 0.741
+},
+{
+"id": "PXL_20260929_003745722_1",
+"score": 0.673
+},
+{
+"id": "PXL_20260929_000348673_0",
+"score": 0.637
+},
+{
+"id": "PXL_20260929_000356157_0",
+"score": 0.63
+},
+{
+"id": "PXL_20260929_003524364_0",
+"score": 0.609
+},
+{
+"id": "PXL_20260929_003745722_0",
+"score": 0.576
+},
+{
+"id": "PXL_20260929_003531325_0",
+"score": 0.556
+},
+{
+"id": "PXL_20261006_225946304_0",
+"score": 0.538
+},
+{
+"id": "PXL_20261003_020248775_0",
+"score": 0.515
+},
+{
+"id": "PXL_20260929_004426230_0",
+"score": 0.448
+}
+]
+},
+{
+"name": "Sharkey",
+"sex": "Male",
+"born": "Apr 11, 2026",
+"intake": "May 11, 2026",
+"photo": "listing/Sharkey.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4100",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20261003_011329673_0",
+"score": 0.739
+},
+{
+"id": "PXL_20260929_013034721_0",
+"score": 0.721
+},
+{
+"id": "PXL_20261003_011444316_0",
+"score": 0.718
+},
+{
+"id": "PXL_20260911_211618643_0",
+"score": 0.716
+},
+{
+"id": "PXL_20261006_234940650_0",
+"score": 0.713
+},
+{
+"id": "PXL_20260929_012858616_0",
+"score": 0.706
+},
+{
+"id": "PXL_20261007_011815512_0",
+"score": 0.688
+},
+{
+"id": "PXL_20260911_211619255_0",
+"score": 0.686
+},
+{
+"id": "PXL_20260911_211616647_0",
+"score": 0.682
+},
+{
+"id": "PXL_20261003_011749853_0",
+"score": 0.681
+}
+]
+},
+{
+"name": "Smoothie",
+"sex": "Female",
+"born": "May 26, 2026",
+"intake": "Jun 30, 2026",
+"photo": "listing/Smoothie.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4254",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260720_222243471_0",
+"score": 0.663
+},
+{
+"id": "PXL_20260720_222247796_1",
+"score": 0.597
+},
+{
+"id": "PXL_20260814_221539422_0",
+"score": 0.597
+},
+{
+"id": "PXL_20260720_222247796_0",
+"score": 0.589
+},
+{
+"id": "PXL_20260804_233627998.PORTRAIT_0",
+"score": 0.579
+},
+{
+"id": "PXL_20260814_221549748.PORTRAIT_0",
+"score": 0.576
+},
+{
+"id": "PXL_20260804_224949184_0",
+"score": 0.572
+},
+{
+"id": "PXL_20260804_233627998.PORTRAIT_1",
+"score": 0.57
+},
+{
+"id": "PXL_20260724_210804382_0",
+"score": 0.57
+},
+{
+"id": "PXL_20260806_213325506_0",
+"score": 0.565
+}
+]
+},
+{
+"name": "Sox",
+"sex": "Female",
+"born": "Mar 24, 2026",
+"intake": "Apr 28, 2026",
+"photo": "listing/Sox.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4046",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260804_214114385_0",
+"score": 0.695
+},
+{
+"id": "PXL_20260607_224453556_0",
+"score": 0.674
+},
+{
+"id": "PXL_20260814_233343480_0",
+"score": 0.671
+},
+{
+"id": "PXL_20260705_194134716_0",
+"score": 0.668
+},
+{
+"id": "PXL_20260709_230237919_1",
+"score": 0.647
+},
+{
+"id": "PXL_20260709_230239501_0",
+"score": 0.643
+},
+{
+"id": "PXL_20260805_001906154_0",
+"score": 0.642
+},
+{
+"id": "PXL_20260705_194134214_0",
+"score": 0.641
+},
+{
+"id": "PXL_20260705_194127139_0",
+"score": 0.641
+},
+{
+"id": "PXL_20260804_214142744_0",
+"score": 0.638
+}
+]
+},
+{
+"name": "Stormy",
+"sex": "Female",
+"born": "Apr 11, 2026",
+"intake": "May 11, 2026",
+"photo": "listing/Stormy.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4101",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260709_232540362_0",
+"score": 0.741
+},
+{
+"id": "PXL_20260709_232538734_0",
+"score": 0.704
+},
+{
+"id": "PXL_20260709_222700050_0",
+"score": 0.65
+},
+{
+"id": "PXL_20260911_224828297_0",
+"score": 0.645
+},
+{
+"id": "PXL_20260709_222700728_0",
+"score": 0.628
+},
+{
+"id": "PXL_20260709_222700050_4",
+"score": 0.599
+},
+{
+"id": "PXL_20260814_224608128.PORTRAIT_0",
+"score": 0.597
+},
+{
+"id": "PXL_20260818_010358110_0",
+"score": 0.588
+},
+{
+"id": "PXL_20260818_010401813_0",
+"score": 0.587
+},
+{
+"id": "PXL_20260818_010400721_0",
+"score": 0.569
+}
+]
+},
+{
+"name": "Toast",
+"sex": "Female",
+"born": "May 26, 2026",
+"intake": "Jun 30, 2026",
+"photo": "listing/Toast.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4255",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20260929_003531325_0",
+"score": 0.818
+},
+{
+"id": "PXL_20260929_000356157_0",
+"score": 0.8
+},
+{
+"id": "PXL_20260929_000348673_0",
+"score": 0.785
+},
+{
+"id": "PXL_20260929_003524364_0",
+"score": 0.735
+},
+{
+"id": "PXL_20260929_003745722_1",
+"score": 0.659
+},
+{
+"id": "PXL_20260929_005040567_0",
+"score": 0.656
+},
+{
+"id": "PXL_20260929_004426230_0",
+"score": 0.63
+},
+{
+"id": "PXL_20260929_003503436_0",
+"score": 0.629
+},
+{
+"id": "PXL_20260929_003745722_0",
+"score": 0.619
+},
+{
+"id": "PXL_20260929_003504944_0",
+"score": 0.602
+}
+]
+},
+{
+"name": "Yin",
+"sex": "Female",
+"born": "Apr 28, 2025",
+"intake": "Jun 6, 2026",
+"photo": "listing/Yin.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4165",
+"in_labels": false,
+"matches": [
+{
+"id": "PXL_20261003_020248775_0",
+"score": 0.725
+},
+{
+"id": "PXL_20260911_223253691_0",
+"score": 0.72
+},
+{
+"id": "PXL_20260911_223302009.PORTRAIT_0",
+"score": 0.712
+},
+{
+"id": "PXL_20260814_235958291_0",
+"score": 0.708
+},
+{
+"id": "PXL_20260907_005243941_0",
+"score": 0.695
+},
+{
+"id": "PXL_20260911_231550901_0",
+"score": 0.68
+},
+{
+"id": "PXL_20260818_011210080_0",
+"score": 0.665
+},
+{
+"id": "PXL_20260908_213511681_0",
+"score": 0.655
+},
+{
+"id": "PXL_20260911_235810592_0",
+"score": 0.644
+},
+{
+"id": "PXL_20260911_235600481_0",
+"score": 0.64
+}
+]
+},
+{
+"name": "Yoplait",
+"sex": "Female",
+"born": "Oct 15, 2020",
+"intake": "May 17, 2026",
+"photo": "listing/Yoplait.jpg",
+"url": "https://www.shelterluv.com/embed/animal/MCT-A-4123",
+"in_labels": true,
+"matches": [
+{
+"id": "PXL_20260731_215439667_0",
+"score": 0.71
+},
+{
+"id": "PXL_20260908_232103644_0",
+"score": 0.662
+},
+{
+"id": "PXL_20260908_232104175_0",
+"score": 0.657
+},
+{
+"id": "PXL_20260731_215441753_0",
+"score": 0.612
+},
+{
+"id": "PXL_20260924_232551453_0",
+"score": 0.6
+},
+{
+"id": "PXL_20260924_232559289_0",
+"score": 0.598
+},
+{
+"id": "PXL_20260918_221100940_0",
+"score": 0.587
+},
+{
+"id": "PXL_20260908_232140561_0",
+"score": 0.573
+},
+{
+"id": "PXL_20260925_002700741_0",
+"score": 0.558
+},
+{
+"id": "PXL_20260924_232555180_0",
+"score": 0.554
+}
+]
+}
+]

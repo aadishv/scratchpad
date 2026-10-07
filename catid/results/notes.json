@@ -33,6 +33,14 @@
  ],
  "findings": [
   {
+   "title": "The shelter's own listings are a free labeled gallery",
+   "body": "The Palo Alto adoption page is a Shelterluv feed: 30 not-yet-adopted cats with sex, birthday, intake date and 1 to 6 official photos. Sex checks the collar code (Nacho female and pink; Dawn, Casper and McFlurry male and blue, all consistent). The intake date rules out sightings before a cat arrived. The photos work as a cross-domain gallery: one listing photo picks the right cat among the 35 in your photos 61% of the time, and has it in the top 3 81% of the time (DINOv2-B, each domain centered separately), with nothing learned from your photos. The new Adoption site tab shows each listed cat next to its closest crops so you can tap to name them. Leads: Toast (a tortie littermate of Microwave and Smoothie) matches the Sep 28 tortie kitten at 0.82, which you named Scythe. Unidentified orange kittens from early September may be Cheeto and Dorito."
+  },
+  {
+   "title": "The big models barely help; animal re-ID models lose",
+   "body": "Labels v5, same recipe. Cross-visit top-1 / known-cat top-3: DINOv2-L 0.56 / 0.85, DINOv2-B 0.54 / 0.87, DINOv2-S 0.54 / 0.87, SigLIP2-so400m 0.46 / 0.78, MiewID 0.46 / 0.70, DINOv3-L 0.46 / 0.64, MegaDescriptor-L 0.41 / 0.70. Averaging DINOv2 L, B and S gives the best known-cat top-3 so far, 0.92. Input resolution (224, 336, 448) changes little. The models trained specifically for animal re-identification do worse here than generic self-supervised features."
+  },
+  {
    "title": "Round 3: splits, a mid-visit adoption, and the Jul 7 cutoff",
    "body": "Your split letters relabeled 40 crops. Bean was really Gobi Bear and Sox; the white-cat groups were Sylph, Casper and Mister Buttons; CalicoKit was Callie and Casper. You named both calico kittens from Oct 6 Callie. Her collar is pink at 4:13 pm and yellow at 4:34 pm, so she was adopted during that visit. The collar rule now allows pink or blue to yellow within one visit too, never back. TuxYellow is Paddington Bear after adoption. Cats last seen on or before Jul 7 are cut (Jade, Martha, Shayla and three unnamed early kittens). Labels v5: 34 cats, 483 crops. Within-visit grouping F1 rose to 0.89. Known-cat top-3 fell to 0.84 to 0.88, because the white-kitten and tabby splits separate cats the model was treating as one. That is the honest number now."
   },

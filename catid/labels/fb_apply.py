@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.dirname(HERE)); import common
 FB = f'{HERE}/feedback'
 CUTOFF = dt.date(2026, 7, 7)
 RENAMES = {'BlackBlue': 'Onyx', 'SmokeKit': 'Onyx', 'OrangeYellow': 'Shovel'}   # user, Oct 7 (chat)
+CHAT_NAMES = {'CalicoTabbyKitPink': 'Smoothie'}   # user, Oct 7 (chat): the 4:13 pm pink-collar kitten is Smoothie, not Callie
 SPLITS = {'CalicoKitYellow': {'PXL_20261006_2313': 'CalicoTabbyKitPink', 'PXL_20261006_2314': 'CalicoTabbyKitPink',
                               'PXL_20261007_011159213': 'CalicoTabbyWin'}}   # my split of the group the user flagged (chat)
 lab = json.load(open(f'{HERE}/labels_v2.json'))
@@ -39,11 +40,13 @@ letters = {}
 for k, d in cat_fb.items():
     for L, name in re.findall(r'\b([A-D])\s*=\s*([^;,\n]+)', d.get('note', '')): letters[(k, L)] = name.strip()
 for did, d in load_dir('crop_fb').items():
+    if d.get('listing'): lab[did] = d['listing']; st['listing_mark'] += 1; continue   # tapped on the Adoption site tab
     L = d.get('split'); cat = d.get('cat')
     if L and (cat, L) in letters: lab[did] = letters[(cat, L)]; st['split_relabel'] += 1
     elif L: lab[did] = f'{cat}_{L}'; st['split_unnamed'] += 1
 # 5. names (cat_fb name field) + chat renames; same name merges
 names = {k: d['name'].strip() for k, d in cat_fb.items() if d.get('name', '').strip()}
+names.update(CHAT_NAMES)
 for did, l in lab.items():
     if l in ('?', 'x'): continue
     b = RENAMES.get(base(l), base(l)); b = names.get(b, b)

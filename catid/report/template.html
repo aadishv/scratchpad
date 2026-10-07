@@ -115,6 +115,12 @@ table.presence tr:hover td { background: var(--chip) }
 .btn.sel-unsure { background: var(--warn); border-color: var(--warn); color: #fff }
 .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink) }
 .saved { font: 12px var(--mono); color: var(--good) }
+.lcard { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-bottom: 14px }
+@media (max-width: 560px) { .lcard { grid-template-columns: minmax(0, 1fr) } }
+.lcard img.lphoto { width: 150px; height: 150px; object-fit: cover; border-radius: 8px; background: var(--sprite-bg) }
+.lcard h3 { font: 700 18px var(--display); margin-bottom: 2px }
+.lcard .meta { color: var(--muted); font-size: 13px }
+.sp .lab { position: absolute; left: 0; right: 0; bottom: 0; font: 500 10px var(--mono); color: #fff; background: rgb(0 0 0 / .55); padding: 1px 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .claude { margin-top: 10px; font-size: 14px; color: var(--muted); max-width: 72ch; white-space: pre-wrap }
 .claude b { color: var(--ink) }
 .btn.ghost { border-style: dashed }
@@ -155,6 +161,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
     <button role="tab" data-tab="roster" aria-selected="false">Roster</button>
     <button role="tab" data-tab="review" aria-selected="false">Review queue <span id="qcount"></span></button>
+    <button role="tab" data-tab="adopt" aria-selected="false">Adoption site</button>
     <button role="tab" data-tab="experiments" aria-selected="false">Experiments</button>
   </nav>
 
@@ -208,6 +215,12 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
       <div style="display:flex;gap:10px;align-items:center;margin-top:10px"><button class="btn primary" id="save-note">Save note</button><span class="saved" id="note-saved"></span></div>
       <div class="notes-list" id="notes"></div>
     </div>
+  </section>
+
+  <section id="tab-adopt" hidden>
+    <h2>Cats listed on the adoption site right now</h2>
+    <p class="sub" style="margin:0 0 14px;max-width:74ch">The Palo Alto listing (Shelterluv) for cats not yet adopted, with each cat's official photo, sex, birthday and intake date. Next to it are the crops from your photos that look most like it, taken only after its intake date. Tap a crop to mark it as that cat (tap again to undo). Your marks become labels.</p>
+    <div id="adopt"></div>
   </section>
 
   <section id="tab-experiments" hidden>
@@ -278,7 +291,9 @@ function sprite(c, size = 76, opts = {}) {
   const fb = FB.crop[c.id];
   if (fb?.verdict) b.classList.add(fb.verdict === 'ok' ? 'ok' : 'flag');
   if (fb?.split) b.append(el('span', { class: 'badge', text: fb.split }));
-  b.addEventListener('click', () => { const cat = base(c.lab); splitMode.has(cat) && opts.split ? cycleSplit(c, cat) : openCrop(c); });
+  if (opts.caption) b.append(el('span', { class: 'lab', text: opts.caption }));
+  if (opts.listing && fb?.listing === opts.listing) b.classList.add('ok');
+  b.addEventListener('click', () => { const cat = base(c.lab); if (opts.onClick) return opts.onClick(c); splitMode.has(cat) && opts.split ? cycleSplit(c, cat) : openCrop(c); });
   return b;
 }
 
@@ -289,7 +304,7 @@ function show(tab) {
   try { localStorage.setItem('tab', tab); } catch (e) {}
 }
 document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
-{ let t = location.hash.slice(1); if (!t) try { t = localStorage.getItem('tab'); } catch (e) {} if (['overview','roster','review','experiments'].includes(t)) show(t); }
+{ let t = location.hash.slice(1); if (!t) try { t = localStorage.getItem('tab'); } catch (e) {} if (['overview','roster','review','adopt','experiments'].includes(t)) show(t); }
 
 // ---------- overview ----------
 const notes = DATA.notes || { status: [], findings: [], next: [] };
@@ -555,6 +570,30 @@ function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-not
   db.collection('pair_fb').onSnapshot(s => { FB.pair = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); refresh(); }, () => {});
   db.collection('notes').orderBy('at', 'desc').limit(100).onSnapshot(s => { FB.notes = s.docs.map(d => d.data()); renderNotes(); }, () => {});
 })();
+
+// ---------- adoption site ----------
+async function markListing(c, name) {
+  const cur = FB.crop[c.id]?.listing; const next = cur === name ? '' : name;
+  FB.crop[c.id] = { ...(FB.crop[c.id] || {}), listing: next }; refresh();
+  if (!db) return;
+  try { await db.collection('crop_fb').doc(c.id).set({ ...FB.crop[c.id], label: c.lab, at: new Date().toISOString() }); }
+  catch (e) { if (e?.code === 'invalid_argument') setReadOnly(); }
+}
+function renderAdopt() {
+  const box = $('#adopt'); box.replaceChildren();
+  for (const L of (DATA.listing || [])) {
+    const marked = Object.entries(FB.crop).filter(([k, v]) => v.listing === L.name).length;
+    const info = el('div', {}, el('img', { class: 'lphoto', src: L.photo, alt: `Listing photo of ${L.name}` }),
+      el('h3', { text: L.name }), el('div', { class: 'meta', text: `${L.sex} · born ${L.born}` }), el('div', { class: 'meta', text: `intake ${L.intake}` }),
+      L.in_labels ? el('div', { class: 'meta', style: 'color:var(--good)', text: 'already in your labels' }) : null,
+      marked ? el('div', { class: 'meta', style: 'color:var(--pink)', text: `${marked} crop${marked > 1 ? 's' : ''} marked` }) : null);
+    const grid = el('div', { class: 'crops' });
+    for (const m of L.matches) { const c = byId[m.id]; if (!c) continue;
+      grid.append(sprite(c, 92, { listing: L.name, caption: `${c.lab === '?' ? 'unknown' : base(c.lab)} · ${vById[c.v].date}`, onClick: canWrite ? (cc) => markListing(cc, L.name) : () => {} })); }
+    box.append(el('div', { class: 'lcard' }, info, el('div', { style: 'min-width:0' }, el('div', { class: 'label', style: 'margin-bottom:6px', text: 'Closest crops in your photos (tap = this is ' + L.name + ')' }), grid)));
+  }
+}
+renderAdopt(); rerenders.add(renderAdopt);
 
 // ---------- experiments ----------
 const COLS = [['name', 'Variant'], ['simR_bal', 'End-to-end (balanced)'], ['simR_closed_known_acc', 'Known cat: top-1'], ['simR_known_top3', 'Known cat: top-3'], ['simR_new_acc', 'New cat caught'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];

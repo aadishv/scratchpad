@@ -1,0 +1,1 @@
+{"model": "dinov2_l", "variant": "cropsm", "tta": true, "n": 975, "sec": 2136.7555832862854, "ms_per_crop": 2191.5441879859336, "dim": 1024}

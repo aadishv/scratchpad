@@ -1,0 +1,1 @@
+{"model": "clip_l14", "variant": "crops", "tta": false, "n": 975, "sec": 405.9921511411667, "ms_per_crop": 416.4022062986325, "dim": 768}

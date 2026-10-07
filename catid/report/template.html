@@ -40,7 +40,7 @@ section[hidden] { display: none }
 .grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px }
 @media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr) } }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px }
 .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px }
 .kpi b { display: block; font: 700 30px/1.1 var(--display); font-variant-numeric: tabular-nums; margin-top: 6px }
 .kpi small { color: var(--muted); font-size: 12.5px; display: block; margin-top: 4px }
@@ -205,6 +205,7 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px }
     <div class="metric-help">
       <div><b>Cross-visit top-1</b>: for each labeled crop, is the most similar crop from a different visit the same cat? Same-visit matches are excluded, since burst shots make them trivial.</div>
       <div><b>Set top-1 / top-3</b>: all crops of one cat from one visit, matched as a group against other visits. Top-3 is the "is it one of these three?" prompt.</div>
+      <div><b>End-to-end acc</b>: replay visits in date order. Cluster each visit's crops, match each cluster to cats confirmed on earlier visits (with a recency prior), or call it a new cat. A crop is right if it gets its true cat, or "new" when that cat was never seen before. <b>Known cat right</b> is the same, counting only cats seen before and ignoring the new-cat threshold.</div>
       <div><b>Within-visit F1</b>: B-cubed F1 of clustering one visit's crops by cat (best threshold).</div>
       <div><b>Open-set</b>: replaying visits in order, does a query get the right known cat, or "new cat" if it has never been seen?</div>
     </div>
@@ -284,6 +285,7 @@ const cats = [...new Set(labeled.map(c => base(c.lab)))];
 const kp = [
   ['Detections', crops.length, `${new Set(crops.map(c => c.id.replace(/_\d+$/, ''))).size} photos, ${visits.length} visits`],
   ['Cats labeled', cats.length, `${labeled.length} crops named; ${crops.filter(c => c.lab === '?').length} unidentifiable`],
+  ['Best end-to-end accuracy', best('simR_acc') ? best('simR_acc').simR_acc.toFixed(2) : '–', best('simR_acc')?.name || ''],
   ['Best cross-visit top-1', best('loose_top1') ? best('loose_top1').loose_top1.toFixed(2) : '–', best('loose_top1')?.name || ''],
   ['Best set top-3', best('set_top3') ? best('set_top3').set_top3.toFixed(2) : '–', best('set_top3')?.name || ''],
   ['Best within-visit F1', best('wv_bF1') ? best('wv_bF1').wv_bF1.toFixed(2) : '–', best('wv_bF1')?.name || ''],
@@ -429,8 +431,8 @@ function setReadOnly() { canWrite = false; $('#ro').hidden = false; $('#save-not
 })();
 
 // ---------- experiments ----------
-const COLS = [['name', 'Variant'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];
-let sortCol = 'loose_top1';
+const COLS = [['name', 'Variant'], ['simR_acc', 'End-to-end acc'], ['simR_closed_known_acc', 'E2E: known cat right'], ['loose_top1', 'Cross-visit top-1'], ['strict_top1', 'Top-1 (confident labels)'], ['loose_mAP', 'mAP'], ['set_top1', 'Set top-1'], ['set_top3', 'Set top-3'], ['wv_bF1', 'Within-visit F1'], ['open_acc', 'Open-set acc'], ['open_known_acc', 'Open: known right'], ['open_new_recall', 'Open: new caught']];
+let sortCol = 'simR_acc';
 function renderRes() {
   const t = $('#res'); t.replaceChildren();
   const hr = el('tr'); for (const [k, n] of COLS) hr.append(el('th', { text: n + (k === sortCol ? ' ↓' : ''), onclick: () => { sortCol = k; renderRes(); } })); t.append(hr);

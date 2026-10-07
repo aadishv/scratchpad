@@ -64,11 +64,15 @@ def score(S, name, out, do_cluster=True):
             b = ev.bcubed(p, np.array([f'{v}_{l}' for v, l in zip(sess[m], y_loose[m])]))
             if best is None or b['bF1'] > best['bF1']: best = dict(b, thr=float(thr))
         r.update({f'wv_{k}': v for k, v in best.items()})
+        fm = [files[i] for i in np.nonzero(m)[0]]
+        r.update(ev.pipeline_sim(S[np.ix_(m, m)], y_loose[m], sess[m], fm, best['thr']))
+        rr = ev.pipeline_sim(S[np.ix_(m, m)], y_loose[m], sess[m], fm, best['thr'], days=times[m] / 86400, rec_w=0.1, rec_tau=21)
+        r.update({'simR_' + k[4:]: v for k, v in rr.items()})
     out.append(r)
     log_result(r)
     print(f"{name:55s} top1 {r['loose_top1']:.3f} mAP {r['loose_mAP']:.3f} | strict top1 {r['strict_top1']:.3f} | "
           f"open acc {r['open_acc']:.3f} (known {r['open_known_acc']:.3f} new {r['open_new_recall']:.3f}) | "
-          f"wv F1 {r.get('wv_bF1', float('nan')):.3f} | set top1 {r['set_top1']:.3f} top3 {r['set_top3']:.3f}", flush=True)
+          f"wv F1 {r.get('wv_bF1', float('nan')):.3f} | set top1 {r['set_top1']:.3f} top3 {r['set_top3']:.3f} | SIM {r.get('sim_acc', float('nan')):.3f} (known {r.get('sim_known_acc', float('nan')):.3f} new {r.get('sim_new_acc', float('nan')):.3f} closed {r.get('sim_closed_known_acc', float('nan')):.3f}) | +recency {r.get('simR_acc', float('nan')):.3f}", flush=True)
     return r
 
 if __name__ == '__main__':

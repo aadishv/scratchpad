@@ -65,3 +65,7 @@ def collar_sim(C, floor=0.004):
 
 def same_photo_mask(files):
     f = np.array(files); return f[:, None] == f[None, :]
+
+def coat_sim(P):
+    """Bhattacharyya overlap of zero-shot coat-pattern distributions, in [0, 1]."""
+    R = np.sqrt(P); return R @ R.T

@@ -74,3 +74,44 @@ def set_retrieval(S, y, sess, agg='mean'):
         ranked = sorted(best, key=lambda c: -best[c])
         n += 1; hits1 += ranked[0] == q[1]; hits3 += q[1] in ranked[:3]
     return {'set_top1': hits1 / n, 'set_top3': hits3 / n, 'n_sets': n}
+
+def pipeline_sim(S, y, sess, files, cluster_thr, taus=np.linspace(0.0, 1.2, 61), k=3, cannot_link=True, days=None, rec_w=0.0, rec_tau=21.0):
+    """End-to-end replay of how the tool would be used. Visits in date order; for each visit:
+      1. cluster its crops (average linkage, distance threshold, same-photo cannot-link),
+      2. score each cluster against every cat confirmed on earlier visits: mean over the cluster's crops of
+         the mean of their top-k similarities to that cat's crops,
+      3. assign the best cat if score > tau, else 'new cat'; then the visit's TRUE labels join the roster
+         (= the user confirmed/corrected the suggestions).
+    A crop is correct if its cluster got its true cat, or 'new' when the cat was never seen before.
+    Returns accuracy at the best tau plus the breakdown."""
+    from sklearn.cluster import AgglomerativeClustering
+    f = np.array(files); recs = []
+    for v in np.unique(sess):
+        idx = np.nonzero(sess == v)[0]
+        if len(idx) == 1: cl = np.array([0])
+        else:
+            D = 1 - S[np.ix_(idx, idx)]
+            if cannot_link: D[f[idx][:, None] == f[idx][None, :]] = 4.0
+            np.fill_diagonal(D, 0)
+            cl = AgglomerativeClustering(n_clusters=None, metric='precomputed', linkage='average', distance_threshold=cluster_thr).fit_predict(D)
+        gal = sess < v; known = set(y[gal])
+        for c in np.unique(cl):
+            m = idx[cl == c]
+            best, bs = None, -9
+            for g in known:
+                G = S[np.ix_(m, np.nonzero(gal & (y == g))[0])]
+                kk = min(k, G.shape[1]); s_ = np.sort(G, axis=1)[:, -kk:].mean()
+                if rec_w and days is not None:  # recency prior: cats come and go (adopted cats stop appearing)
+                    s_ += rec_w * np.exp(-(days[idx[0]] - days[gal & (y == g)].max()) / rec_tau)
+                if s_ > bs: best, bs = g, s_
+            for i in m: recs.append((y[i], best, bs, y[i] not in known))
+    out = None
+    for t in taus:
+        ok = [(p == yt and s >= t) if not new else (s < t) for yt, p, s, new in recs]
+        acc = float(np.mean(ok))
+        if out is None or acc > out['sim_acc']:
+            kn = [o for o, r in zip(ok, recs) if not r[3]]; nw = [o for o, r in zip(ok, recs) if r[3]]
+            out = {'sim_acc': acc, 'sim_tau': float(t), 'sim_known_acc': float(np.mean(kn)), 'sim_new_acc': float(np.mean(nw)) if nw else float('nan'),
+                   'sim_n_known': len(kn), 'sim_n_new': len(nw)}
+    out['sim_closed_known_acc'] = float(np.mean([p == yt for yt, p, s, new in recs if not new]))
+    return out

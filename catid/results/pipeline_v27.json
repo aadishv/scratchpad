@@ -2,73 +2,29 @@
  "photos": 35,
  "crops": 33,
  "timing_s": {
-  "load models": 4.11,
-  "decode": 1.27,
-  "detect": 6.94,
-  "dedupe+collar": 0.95,
+  "load models": 3.52,
+  "decode": 1.31,
+  "detect": 8.3,
+  "dedupe+collar": 1.0,
   "crop": 0.56,
-  "embed": 22.34,
-  "group+match": 0.42
+  "embed": 8.82,
+  "group+match": 0.2
  },
  "ms_per_photo": {
-  "decode": 36.2,
-  "detect": 198.2,
-  "dedupe+collar": 27.0,
-  "crop": 16.0,
-  "embed": 638.4,
-  "group+match": 12.0
+  "decode": 37.5,
+  "detect": 237.1,
+  "dedupe+collar": 28.5,
+  "crop": 15.9,
+  "embed": 252.0,
+  "group+match": 5.6
  },
- "ms_per_photo_total": 927.8,
+ "ms_per_photo_total": 576.6,
  "groups": [
   {
    "group": 0,
    "crops": [
-    0,
-    26,
-    29
-   ],
-   "suggest": [
-    {
-     "cat": "BlackLH",
-     "score": 0.402
-    },
-    {
-     "cat": "FluffyCalico",
-     "score": 0.382
-    },
-    {
-     "cat": "TuxLH",
-     "score": 0.32
-    }
-   ],
-   "call": "NEW"
-  },
-  {
-   "group": 1,
-   "crops": [
-    12,
-    31,
-    32
-   ],
-   "suggest": [
-    {
-     "cat": "FluffyCalico",
-     "score": 0.97
-    },
-    {
-     "cat": "BlackLH",
-     "score": 0.428
-    },
-    {
-     "cat": "TuxLH",
-     "score": 0.423
-    }
-   ],
-   "call": "FluffyCalico"
-  },
-  {
-   "group": 2,
-   "crops": [
+    2,
+    3,
     4,
     5,
     6,
@@ -80,65 +36,46 @@
    ],
    "suggest": [
     {
-     "cat": "GrayWhiteKit",
-     "score": 0.514
-    },
-    {
-     "cat": "OrangeYellow",
-     "score": 0.474
-    },
-    {
      "cat": "Bean",
-     "score": 0.467
-    }
-   ],
-   "call": "NEW"
-  },
-  {
-   "group": 3,
-   "crops": [
-    2,
-    3
-   ],
-   "suggest": [
-    {
-     "cat": "Bean",
-     "score": 0.503
+     "score": 0.536
     },
     {
-     "cat": "Torbie",
-     "score": 0.472
+     "cat": "TabbyLime",
+     "score": 0.491
     },
     {
-     "cat": "TabbyBlueChair",
+     "cat": "TabbyWhiteAdult",
      "score": 0.469
     }
    ],
    "call": "NEW"
   },
   {
-   "group": 4,
+   "group": 1,
    "crops": [
-    1
+    12,
+    30,
+    31,
+    32
    ],
    "suggest": [
     {
-     "cat": "Jade",
-     "score": 0.64
+     "cat": "FluffyCalico",
+     "score": 0.794
     },
     {
-     "cat": "BlackKit_v25",
-     "score": 0.622
+     "cat": "CalicoTabbyWin",
+     "score": 0.465
     },
     {
-     "cat": "BlackYellow",
-     "score": 0.575
+     "cat": "OrangeYellow",
+     "score": 0.418
     }
    ],
-   "call": "Jade"
+   "call": "FluffyCalico"
   },
   {
-   "group": 5,
+   "group": 2,
    "crops": [
     13,
     14,
@@ -156,63 +93,65 @@
    "suggest": [
     {
      "cat": "OrangeYellow",
-     "score": 0.75
+     "score": 0.656
     },
     {
      "cat": "OrangePink",
-     "score": 0.677
+     "score": 0.57
     },
     {
      "cat": "OrangeWhite",
-     "score": 0.58
+     "score": 0.461
     }
    ],
    "call": "OrangeYellow"
   },
   {
-   "group": 6,
-   "crops": [
-    30
-   ],
-   "suggest": [
-    {
-     "cat": "CalicoTabbyWin",
-     "score": 0.788
-    },
-    {
-     "cat": "DiluteCalico",
-     "score": 0.55
-    },
-    {
-     "cat": "GrayTabbyLedge",
-     "score": 0.532
-    }
-   ],
-   "call": "CalicoTabbyWin"
-  },
-  {
-   "group": 7,
+   "group": 3,
    "crops": [
     27
    ],
    "suggest": [
     {
      "cat": "Jade",
-     "score": 0.356
+     "score": 0.41
     },
     {
      "cat": "TuxPink",
-     "score": 0.289
+     "score": 0.334
     },
     {
-     "cat": "PiebaldTux",
-     "score": 0.268
+     "cat": "BlackYellow",
+     "score": 0.297
     }
    ],
    "call": "NEW"
   },
   {
-   "group": 8,
+   "group": 4,
+   "crops": [
+    0,
+    26,
+    29
+   ],
+   "suggest": [
+    {
+     "cat": "Rocky",
+     "score": 0.308
+    },
+    {
+     "cat": "Jade",
+     "score": 0.261
+    },
+    {
+     "cat": "TuxBlue_v11",
+     "score": 0.24
+    }
+   ],
+   "call": "NEW"
+  },
+  {
+   "group": 5,
    "crops": [
     25,
     28
@@ -220,18 +159,39 @@
    "suggest": [
     {
      "cat": "LynxPoint",
-     "score": 0.888
-    },
-    {
-     "cat": "Siamese",
-     "score": 0.79
+     "score": 0.61
     },
     {
      "cat": "WhiteKit",
-     "score": 0.449
+     "score": 0.575
+    },
+    {
+     "cat": "Siamese",
+     "score": 0.492
     }
    ],
    "call": "LynxPoint"
+  },
+  {
+   "group": 6,
+   "crops": [
+    1
+   ],
+   "suggest": [
+    {
+     "cat": "Jade",
+     "score": 0.682
+    },
+    {
+     "cat": "BlackYellow",
+     "score": 0.494
+    },
+    {
+     "cat": "BlackBlue",
+     "score": 0.478
+    }
+   ],
+   "call": "Jade"
   }
  ],
  "crops_meta": [

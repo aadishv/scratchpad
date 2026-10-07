@@ -57,7 +57,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('photos'); ap.add_argument('--roster'); ap.add_argument('--out', default='pipeline_out')
     ap.add_argument('--det', default='yolo11n-seg.pt'); ap.add_argument('--imgsz', type=int, default=640)
-    ap.add_argument('--emb', default='dinov2_b'); ap.add_argument('--threads', type=int, default=4)
+    ap.add_argument('--emb', default='dinov2_s'); ap.add_argument('--threads', type=int, default=4)
     ap.add_argument('--cluster-thr', type=float, default=0.7); ap.add_argument('--new-thr', type=float, default=0.55)
     ap.add_argument('--files', nargs='*', help='subset of file names to process')
     a = ap.parse_args()

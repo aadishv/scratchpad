@@ -41,8 +41,8 @@
    "body": "Cross-visit top-1 by coat: calico/tortie 0.83, colourpoint/white 0.68, orange 0.49, tuxedo/bicolour 0.42, solid black 0.35, tabby 0.35. Calico patches work like a fingerprint. Black cats differ mainly in eye colour, size, fur length and collar, and generic embeddings barely see those. For black cats, collars (and the names written on them) carry most of the signal."
   },
   {
-   "title": "A fast pipeline for a new visit: about 1 s per photo on a laptop-class CPU",
-   "body": "catid/pipeline.py takes a folder of new photos and the roster of confirmed cats and returns groups with top-3 suggestions or 'new cat', plus an HTML contact sheet. YOLO11n-seg at 640px with DINOv2-B runs at about 0.6 s per photo on 4 cores (1 s while sharing the CPU), against 2 s per photo for detection alone with the big YOLO. Embedding is two thirds of the time; a smaller DINOv2 and ONNX are next. Replaying the Oct 6 visit against the roster from earlier visits: known cats named right first 79%, in the top 3 100%, and 83% of new-kitten crops correctly flagged as new (threshold 0.55)."
+   "title": "A fast pipeline for a new visit: about 0.6 s per photo on 4 CPU cores",
+   "body": "catid/pipeline.py takes a folder of new photos and the roster of confirmed cats and returns groups with top-3 suggestions or 'new cat', plus an HTML contact sheet. With YOLO11n-seg at 640px and DINOv2-S it runs at about 0.58 s per photo while sharing the CPU with other jobs (detect 240 ms, embed 250 ms). That compares with 2 s per photo for detection alone with the big YOLO. DINOv2-S is as accurate as DINOv2-B here (cross-visit top-1 0.49 vs 0.49) at a quarter of the cost. Replaying the Oct 6 visit against the roster from earlier visits: known cats named right first 71 to 79%, in the top 3 100%, and 83% of new-kitten crops flagged as new."
   },
   {
    "title": "Two detections in one photo are usually the same cat",
@@ -83,6 +83,14 @@
   {
    "title": "Same visit is easy, a new visit is hard",
    "body": "Grouping crops of one visit by cat reaches B-cubed F1 0.83. Recognising a cat on a different visit gives top-1 around 0.4, and the right cat is in the top 3 about 70% of the time at the set level. Kittens change fast (eye colour, size, colourpoint darkening), so the gallery has to keep updating."
+  },
+  {
+   "title": "Newer is not better: DINOv3-B is worse than DINOv2-B here",
+   "body": "With the same recipe, DINOv3-B (CLS token, 320px) gets cross-visit top-1 0.37 against 0.50 for DINOv2-B, and averaging the two does not help. A helper session is testing whether pooling DINOv3's patch tokens changes this."
+  },
+  {
+   "title": "The coat gate cannot be folded into DINOv2",
+   "body": "A linear probe on DINOv2 features trained to reproduce CLIP's coat call agrees with it only 56% of the time, and gating with it adds nothing. The coat gate helps because CLIP sees colour patterns differently, so it stays a separate (optional) model in the accurate setting."
   }
  ],
  "next": [

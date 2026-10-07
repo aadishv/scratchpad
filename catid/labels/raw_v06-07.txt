@@ -1,0 +1,16 @@
+6: 0 TabbyHammock~
+6: 1,2,3,5,8 ?
+6: 4 OrangePink
+6: 6,7 BlackBlue~
+6: 9,10 Torbie~
+7: 0,1,3,11,13,15,16,17,20,21,23,25,26,27,28,32,33,35,36,37,38 ?
+7: 2,4 WhiteBlackTail
+7: 5,6,7,8,9 WhiteGraySpot
+7: 10,12,18 TabbyWhiteAdult
+7: 14 TabbyPink~
+7: 19,22 OrangeBlue~
+7: 24 TuxPink~
+7: 29,30,31 TuxBlueWin~
+7: 34 BlackBlue~
+7: 39,40,41 TabbyWhitePink_v7
+7: 42 SpottedTabby~

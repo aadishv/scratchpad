@@ -153,8 +153,8 @@
    "body": "Making assignment within a visit one-to-one (Hungarian matching, so two groups cannot both claim the same known cat) slightly lowered set-level top-1 from 0.74 to 0.72. New cats' groups steal known cats' names under the constraint. A learned new-vs-known classifier over cluster features (score, margin, size, days since last seen, collar agreement) also did not beat a tuned threshold. The vision-model 'none of these' answer is the better new-cat signal."
   },
   {
-   "title": "Fine-tuning DINOv2 end to end: a small mixed result (first run)",
-   "body": "A helper fine-tuned DINOv2-S (last 4 blocks, SupCon loss, 400 steps, 224px, batches of 8 cats x 4 crops spread across visits, no colour jitter), testing each visit with a model that never saw it (5-fold leave-visits-out). Compared with the same frozen model at 224px: top-1 0.53 vs 0.54 (flat), known-cat top-3 in the replay 0.88 vs 0.81 (+7), balanced end-to-end 0.64 vs 0.62, retrieval mAP 0.46 vs 0.42. So training ranks the right cat higher in the list without making the first guess more often right. More runs (ArcFace loss, full and gentle unfreezing, DINOv2-B) are coming."
+   "title": "Fine-tuning DINOv2 end to end: helps the top-3 list, not the first guess",
+   "body": "Helpers fine-tuned DINOv2-S and DINOv2-B (last 4 blocks, SupCon loss, 224px, batches of 8 cats x 4 crops spread across visits, no colour jitter), testing each visit with a model that never saw it (5-fold leave-visits-out). Each fine-tuned model alone ties its frozen version on top-1 (S 0.53 vs 0.54, B 0.52 vs 0.54), but known-cat top-3 in the replay rises (S 0.88 vs 0.81, B 0.90 vs 0.84) and so do mAP and the balanced end-to-end score (0.64 to 0.65). In ensembles with the frozen models plus query expansion, the best single-photo top-1 is 0.59 and the best replay top-3 0.92, about level with the frozen-only L+B+S ensemble. With ~35 cats and ~400 confirmed crops there is not enough data for training to beat a strong frozen backbone on the first guess. More confirmed cats would change that."
   }
  ],
  "next": [

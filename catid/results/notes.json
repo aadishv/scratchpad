@@ -151,6 +151,10 @@
   {
    "title": "Forcing one cat per group within a visit doesn't help",
    "body": "Making assignment within a visit one-to-one (Hungarian matching, so two groups cannot both claim the same known cat) slightly lowered set-level top-1 from 0.74 to 0.72. New cats' groups steal known cats' names under the constraint. A learned new-vs-known classifier over cluster features (score, margin, size, days since last seen, collar agreement) also did not beat a tuned threshold. The vision-model 'none of these' answer is the better new-cat signal."
+  },
+  {
+   "title": "Fine-tuning DINOv2 end to end: a small mixed result (first run)",
+   "body": "A helper fine-tuned DINOv2-S (last 4 blocks, SupCon loss, 400 steps, 224px, batches of 8 cats x 4 crops spread across visits, no colour jitter), testing each visit with a model that never saw it (5-fold leave-visits-out). Compared with the same frozen model at 224px: top-1 0.53 vs 0.54 (flat), known-cat top-3 in the replay 0.88 vs 0.81 (+7), balanced end-to-end 0.64 vs 0.62, retrieval mAP 0.46 vs 0.42. So training ranks the right cat higher in the list without making the first guess more often right. More runs (ArcFace loss, full and gentle unfreezing, DINOv2-B) are coming."
   }
  ],
  "next": [
